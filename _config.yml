@@ -1,0 +1,51 @@
+# 사이트 기본 정보
+title: 오산대광교회
+description: 하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회
+url: "https://osandaekwang.github.io"
+baseurl: "/dgmtv-website"
+
+# Jekyll 설정
+markdown: kramdown
+highlighter: rouge
+permalink: /:categories/:year/:month/:day/:title/
+
+# 컬렉션 설정
+collections:
+  posts:
+    output: true
+    permalink: /:collection/:name/
+
+# 기본값 설정
+defaults:
+  - scope:
+      path: "_posts/news"
+    values:
+      layout: "post"
+      category: "news"
+  - scope:
+      path: "_posts/resources"
+    values:
+      layout: "post"
+      category: "resources"
+
+# 플러그인 (GitHub Pages에서 지원하는 것들)
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# 제외할 파일/폴더
+exclude:
+  - admin/
+  - README.md
+  - .gitignore
+
+# 포함할 파일
+include:
+  - _pages
+
+# 타임존
+timezone: Asia/Seoul
+
+# 언어
+lang: ko
