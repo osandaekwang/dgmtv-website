@@ -1,5 +1,5 @@
 backend:
-  name: github
+  name: git-gatewa
   repo: osandaekwang/dgmtv-website
   branch: main
 
