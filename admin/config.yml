@@ -1,0 +1,47 @@
+backend:
+  name: github
+  repo: osandaekwang/dgmtv-website
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "news"
+    label: "뉴스"
+    folder: "_posts/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "발행일", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "category", widget: "select", options: ["중요", "행사", "예정", "일반"]}
+      - {label: "내용", name: "body", widget: "markdown"}
+      - {label: "이미지", name: "image", widget: "image", required: false}
+
+  - name: "resources"
+    label: "자료"
+    folder: "_posts/resources"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "발행일", name: "date", widget: "datetime"}
+      - {label: "타입", name: "type", widget: "select", options: ["기독교 기사", "신학 논문", "다운로드 자료"]}
+      - {label: "설명", name: "description", widget: "text"}
+      - {label: "내용", name: "body", widget: "markdown"}
+      - {label: "첨부파일", name: "file", widget: "file", required: false}
+
+  - name: "settings"
+    label: "설정"
+    files:
+      - label: "사이트 설정"
+        name: "site"
+        file: "_data/settings.yml"
+        fields:
+          - {label: "사이트 제목", name: "title", widget: "string"}
+          - {label: "사이트 설명", name: "description", widget: "text"}
+          - {label: "교회 전화번호", name: "phone", widget: "string"}
+          - {label: "교회 이메일", name: "email", widget: "string"}
+          - {label: "교회 주소", name: "address", widget: "text"}
+          - {label: "푸터 메시지", name: "footer_text", widget: "text", default: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"}
