@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오산대광교회 CMS - 실제 작동 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        .sidebar-collapsed {
+            transform: translateX(-100%);
+        }
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+        .main-content-expanded {
+            margin-left: 0;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .menu-item {
+            transition: all 0.3s ease;
+        }
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateX(5px);
+        }
+        .menu-item.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+        .editor {
+            min-height: 300px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast.success {
+            background: #10b981;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.warning {
+            background: #f59e0b;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .file-drop-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .file-drop-zone.dragover {
+            border-color: #4f46e5;
+            background: #f3f4f6;
+        }
+        .github-connected {
+            background: #10b981;
+            color: white;
+        }
+        .github-disconnected {
+            background: #ef4444;
+            color: white;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+
+// 공통 데이터 구조 및 동기화 시스템
+window.DGMTV_SHARED = window.DGMTV_SHARED || {
+    // 데이터 키 상수
+    KEYS: {
+        NEWS: 'dgmtv_news',
+        RESOURCES: 'dgmtv_resources', 
+        FOOTER_TEXT: 'dgmtv_footer_text',
+        VISITOR_STATS: 'dgmtv_visitor_stats',
+        SETTINGS: 'dgmtv_settings',
+        LAST_UPDATE: 'dgmtv_last_update'
+    },
+
+    // 데이터 가져오기
+    getData: function(key, defaultValue = null) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : defaultValue;
+        } catch (e) {
+            console.error('데이터 읽기 오류:', e);
+            return defaultValue;
+        }
+    },
+
+    // 데이터 저장
+    setData: function(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            localStorage.setItem(this.KEYS.LAST_UPDATE, Date.now());
+            this.notifyUpdate(key, value);
+            return true;
+        } catch (e) {
+            console.error('데이터 저장 오류:', e);
+            return false;
+        }
+    },
+
+    // 업데이트 알림
+    notifyUpdate: function(key, value) {
+        // 다른 창/탭에 변경사항 알림
+        try {
+            window.dispatchEvent(new CustomEvent('dgmtv_data_update', {
+                detail: { key: key, value: value, timestamp: Date.now() }
+            }));
+        } catch (e) {
+            console.error('업데이트 알림 오류:', e);
+        }
+    },
+
+    // 실시간 동기화 설정
+    setupSync: function(callback) {
+        // localStorage 변경 감지
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('dgmtv_')) {
+                if (callback) callback(e.key, e.newValue);
+            }
+        });
+
+        // 같은 창에서의 변경사항 감지
+        window.addEventListener('dgmtv_data_update', function(e) {
+            if (callback) callback(e.detail.key, e.detail.value);
+        });
+    },
+
+    // 초기 데이터 설정
+    initializeData: function() {
+        // 기본 뉴스 데이터
+        if (!this.getData(this.KEYS.NEWS)) {
+            this.setData(this.KEYS.NEWS, []);
+        }
+
+        // 기본 자료 데이터
+        if (!this.getData(this.KEYS.RESOURCES)) {
+            this.setData(this.KEYS.RESOURCES, []);
+        }
+
+        // 기본 푸터 텍스트
+        if (!this.getData(this.KEYS.FOOTER_TEXT)) {
+            this.setData(this.KEYS.FOOTER_TEXT, "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회");
+        }
+
+        // 기본 방문자 통계
+        if (!this.getData(this.KEYS.VISITOR_STATS)) {
+            this.setData(this.KEYS.VISITOR_STATS, {
+                daily: 0,
+                total: 0,
+                lastVisitDate: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        // 기본 설정
+        if (!this.getData(this.KEYS.SETTINGS)) {
+            this.setData(this.KEYS.SETTINGS, {
+                siteName: "오산대광교회",
+                description: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회",
+                phone: "031-377-0675",
+                email: "derek1817@naver.com",
+                address: "경기도 오산시 궐리사로46번길 60-5"
+            });
+        }
+    }
+};
+
+// 초기화
+window.DGMTV_SHARED.initializeData();
+
+</script>
+    <script>
+
+// CMS 데이터 동기화 시스템
+window.DGMTV_CMS = {
+    // 기존 dataStore를 공통 저장소와 연동
+    syncDataStore: function() {
+        if (typeof dataStore !== 'undefined') {
+            // 기존 dataStore의 데이터를 공통 저장소에 저장
+            if (dataStore.news) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.NEWS, dataStore.news);
+            }
+            if (dataStore.resources) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.RESOURCES, dataStore.resources);
+            }
+            if (dataStore.settings && dataStore.settings.footerText) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT, dataStore.settings.footerText);
+            }
+        }
+    },
+
+    // 공통 저장소에서 dataStore로 데이터 로드
+    loadFromSharedStorage: function() {
+        if (typeof dataStore !== 'undefined') {
+            const news = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.NEWS, []);
+            const resources = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.RESOURCES, []);
+            const footerText = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT);
+
+            if (news) dataStore.news = news;
+            if (resources) dataStore.resources = resources;
+            if (footerText && dataStore.settings) {
+                dataStore.settings.footerText = footerText;
+            }
+        }
+    },
+
+    // 기존 저장 함수 확장
+    extendSaveData: function() {
+        if (typeof saveData === 'function') {
+            const originalSaveData = saveData;
+            window.saveData = function() {
+                // 기존 저장 실행
+                const result = originalSaveData.apply(this, arguments);
+
+                // 공통 저장소에도 저장
+                window.DGMTV_CMS.syncDataStore();
+
+                return result;
+            };
+        }
+    },
+
+    // 뉴스 저장 함수 확장
+    extendNewsSave: function() {
+        if (typeof handleNewsSave === 'function') {
+            const originalHandleNewsSave = handleNewsSave;
+            window.handleNewsSave = function() {
+                // 기존 저장 실행
+                const result = originalHandleNewsSave.apply(this, arguments);
+
+                // 공통 저장소에 뉴스 데이터 저장
+                if (typeof dataStore !== 'undefined' && dataStore.news) {
+                    window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.NEWS, dataStore.news);
+                }
+
+                return result;
+            };
+        }
+    },
+
+    // 푸터 저장 함수 확장
+    extendFooterSave: function() {
+        if (typeof saveFooterText === 'function') {
+            const originalSaveFooterText = saveFooterText;
+            window.saveFooterText = function() {
+                // 기존 저장 실행
+                const result = originalSaveFooterText.apply(this, arguments);
+
+                // 공통 저장소에 푸터 텍스트 저장
+                if (typeof dataStore !== 'undefined' && dataStore.settings && dataStore.settings.footerText) {
+                    window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT, dataStore.settings.footerText);
+                }
+
+                return result;
+            };
+        }
+    },
+
+    // 방문자 통계 연동
+    syncVisitorStats: function() {
+        const sharedStats = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.VISITOR_STATS, {
+            daily: 0,
+            total: 0,
+            lastVisitDate: new Date().toISOString().split('T')[0]
+        });
+
+        // CMS 대시보드에 방문자 통계 표시
+        const dailyElement = document.getElementById('dailyVisitors');
+        const totalElement = document.getElementById('totalVisitors');
+
+        if (dailyElement) dailyElement.textContent = sharedStats.daily;
+        if (totalElement) totalElement.textContent = sharedStats.total;
+    },
+
+    // 실시간 동기화 설정
+    setupRealtimeSync: function() {
+        // 다른 창에서의 변경사항 감지
+        window.DGMTV_SHARED.setupSync((key, value) => {
+            if (key === window.DGMTV_SHARED.KEYS.VISITOR_STATS) {
+                this.syncVisitorStats();
+            }
+
+            // 기존 UI 업데이트 함수들 호출
+            if (typeof updateNewsList === 'function') {
+                updateNewsList();
+            }
+            if (typeof updateResourcesList === 'function') {
+                updateResourcesList();
+            }
+        });
+
+        // 주기적 동기화 (10초마다)
+        setInterval(() => {
+            this.syncVisitorStats();
+        }, 10000);
+    },
+
+    // 초기화
+    init: function() {
+        // 기존 함수들 확장
+        this.extendSaveData();
+        this.extendNewsSave();
+        this.extendFooterSave();
+
+        // 공통 저장소에서 데이터 로드
+        this.loadFromSharedStorage();
+
+        // 실시간 동기화 설정
+        this.setupRealtimeSync();
+
+        // 방문자 통계 동기화
+        this.syncVisitorStats();
+
+        console.log('DGMTV CMS 동기화 시스템 초기화 완료');
+    }
+};
+
+// CMS 로드 완료 후 초기화 (약간의 지연을 두어 기존 스크립트 로드 대기)
+document.addEventListener('DOMContentLoaded', function() {
+    // 기본 이벤트 리스너 설정
+    setupEventListeners();
+
+    // 초기 데이터 로드 및 UI 업데이트
+    loadData();
+    updateNewsList();
+    updateResourcesList(); 
+    updatePopupsList();
+    loadFooterText();
+    setupFooterPreview();
+
+    // 동기화 시스템 초기화 (약간의 지연)
+    setTimeout(function() {
+        if (window.DGMTV_CMS) {
+            window.DGMTV_CMS.init();
+        }
+    }, 500);
+});
+
+</script>
+</head>
+<body class="bg-gray-100">
+    <!-- Toast 알림 -->
+    <div id="toast" class="toast"></div>
+
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="modal show">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <i class="fas fa-church text-4xl text-indigo-600 mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-800">오산대광교회 CMS</h2>
+                <p class="text-gray-600">실제 작동 관리 시스템</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">사용자명</label>
+                    <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="admin" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                    <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="dgmtv2025" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
+                    로그인
+                </button>
+            </form>
+            <div class="mt-4 text-sm text-gray-600">
+                <p><strong>테스트 계정:</strong></p>
+                <p>관리자: admin / dgmtv2025</p>
+                <p>에디터: editor / editor123</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- 사이드바 -->
+        <div id="sidebar" class="sidebar bg-white shadow-lg w-64 fixed h-full z-50">
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-church text-2xl text-indigo-600"></i>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-800">오산대광교회</h1>
+                        <p class="text-sm text-gray-600">CMS 관리자</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="mt-6">
+                <div class="px-4">
+                    <div class="menu-item active px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('dashboard')">
+                        <i class="fas fa-tachometer-alt mr-3"></i>대시보드
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('news')">
+                        <i class="fas fa-newspaper mr-3"></i>뉴스 관리
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('resources')">
+                        <i class="fas fa-book mr-3"></i>자료 관리
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('videos')">
+                        <i class="fas fa-video mr-3"></i>영상 관리
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('pages')">
+                        <i class="fas fa-edit mr-3"></i>페이지 수정
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('popup')">
+                        <i class="fas fa-window-restore mr-3"></i>팝업 관리
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('settings')">
+                        <i class="fas fa-cog mr-3"></i>설정
+                    </div>
+                    <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('preview')">
+                        <i class="fas fa-eye mr-3"></i>미리보기
+                    </div>
+                </div>
+            <div class="menu-item px-4 py-3 rounded-lg cursor-pointer mb-2" onclick="showTab('footerManagement')">
+                <i class="fas fa-edit mr-3"></i>푸터 관리
+            </div>
+            </nav>
+
+            <div class="absolute bottom-0 w-full p-4 border-t">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium" id="userDisplay">관리자</p>
+                        <button onclick="logout()" class="text-xs text-gray-500 hover:text-gray-700">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div id="mainContent" class="main-content flex-1 ml-64">
+            <!-- 헤더 -->
+            <header class="bg-white shadow-sm border-b p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button id="sidebarToggle" class="lg:hidden">
+                            <i class="fas fa-bars text-gray-600"></i>
+                        </button>
+                        <h2 id="pageTitle" class="text-xl font-semibold text-gray-800">대시보드</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div id="githubStatus" class="px-3 py-1 rounded-full text-sm github-disconnected">
+                            <i class="fab fa-github mr-2"></i>GitHub 연결 안됨
+                        </div>
+                        <button onclick="saveAll()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm">
+                            <i class="fas fa-save mr-2"></i>모든 변경사항 저장
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 탭 콘텐츠 -->
+            <div class="p-6">
+                <!-- 대시보드 -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">총 뉴스</p>
+                                    <p class="text-2xl font-bold text-gray-800" id="totalNews">0</p>
+                                                        <!-- 방문자 통계 카드들 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">일일 방문자</p>
+                                    <p class="text-2xl font-bold text-gray-800" id="dailyVisitors">0</p>
+                                </div>
+                                <i class="fas fa-users text-3xl text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">누적 방문자</p>
+                                    <p class="text-2xl font-bold text-gray-800" id="totalVisitors">0</p>
+                                </div>
+                                <i class="fas fa-chart-line text-3xl text-purple-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                                <i class="fas fa-newspaper text-3xl text-blue-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">총 자료</p>
+                                    <p class="text-2xl font-bold text-gray-800" id="totalResources">0</p>
+                                </div>
+                                <i class="fas fa-book text-3xl text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">API 사용량</p>
+                                    <p class="text-2xl font-bold text-gray-800">2,450</p>
+                                </div>
+                                <i class="fas fa-chart-line text-3xl text-purple-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">마지막 백업</p>
+                                    <p class="text-sm font-medium text-gray-800" id="lastBackup">1시간 전</p>
+                                </div>
+                                <i class="fas fa-cloud text-3xl text-orange-500"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">최근 활동</h3>
+                            <div id="recentActivity" class="space-y-3">
+                                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                    <i class="fas fa-plus-circle text-green-500"></i>
+                                    <div>
+                                        <p class="text-sm font-medium">새 뉴스 추가됨</p>
+                                        <p class="text-xs text-gray-500">5분 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">빠른 작업</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="showTab('news')" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg text-sm">
+                                    <i class="fas fa-plus mr-2"></i>뉴스 추가
+                                </button>
+                                <button onclick="showTab('resources')" class="bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg text-sm">
+                                    <i class="fas fa-upload mr-2"></i>자료 업로드
+                                </button>
+                                <button onclick="showTab('popup')" class="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-lg text-sm">
+                                    <i class="fas fa-window-restore mr-2"></i>팝업 생성
+                                </button>
+                                <button onclick="showTab('preview')" class="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg text-sm">
+                                    <i class="fas fa-eye mr-2"></i>미리보기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 뉴스 관리 -->
+                <div id="news" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">뉴스 관리</h3>
+                        <button onclick="showNewsEditor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-plus mr-2"></i>새 뉴스 작성
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 뉴스 목록 -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">게시된 뉴스</h4>
+                            </div>
+                            <div id="newsList" class="p-6">
+                                <!-- 뉴스 목록이 여기에 동적으로 추가됩니다 -->
+                            </div>
+                        </div>
+
+                        <!-- 뉴스 에디터 -->
+                        <div id="newsEditor" class="bg-white rounded-lg shadow" style="display: none;">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">뉴스 작성/수정</h4>
+                            </div>
+                            <div class="p-6">
+                                <form id="newsForm">
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+                                        <input type="text" id="newsTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+                                        <select id="newsCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option value="중요">중요</option>
+                                            <option value="행사">행사</option>
+                                            <option value="예정">예정</option>
+                                            <option value="일반">일반</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+                                        <textarea id="newsContent" class="editor w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="6" required></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">날짜</label>
+                                        <input type="date" id="newsDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                    </div>
+                                    <div class="flex space-x-3">
+                                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                            <i class="fas fa-save mr-2"></i>저장
+                                        </button>
+                                        <button type="button" onclick="cancelNewsEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                                            취소
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 자료 관리 -->
+                <div id="resources" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">자료 관리</h3>
+                        <button onclick="showResourceEditor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-plus mr-2"></i>새 자료 추가
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- 기독교 기사 -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">기독교 기사</h4>
+                            </div>
+                            <div id="articlesList" class="p-6">
+                                <!-- 기사 목록 -->
+                            </div>
+                        </div>
+
+                        <!-- 신학 논문 -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">신학 논문</h4>
+                            </div>
+                            <div id="papersList" class="p-6">
+                                <!-- 논문 목록 -->
+                            </div>
+                        </div>
+
+                        <!-- 다운로드 자료 -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">다운로드 자료</h4>
+                            </div>
+                            <div id="downloadsList" class="p-6">
+                                <!-- 다운로드 자료 목록 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 자료 에디터 -->
+                    <div id="resourceEditor" class="mt-6 bg-white rounded-lg shadow" style="display: none;">
+                        <div class="p-6 border-b">
+                            <h4 class="font-medium">자료 추가/수정</h4>
+                        </div>
+                        <div class="p-6">
+                            <form id="resourceForm">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+                                        <input type="text" id="resourceTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+                                        <select id="resourceCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option value="articles">기독교 기사</option>
+                                            <option value="papers">신학 논문</option>
+                                            <option value="downloads">다운로드 자료</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">링크 또는 파일</label>
+                                    <input type="url" id="resourceUrl" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="http://example.com">
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+                                    <textarea id="resourceDescription" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3"></textarea>
+                                </div>
+                                <div class="mt-6 flex space-x-3">
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                        <i class="fas fa-save mr-2"></i>저장
+                                    </button>
+                                    <button type="button" onclick="cancelResourceEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                                        취소
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 영상 관리 -->
+                <div id="videos" class="tab-content">
+                    <h3 class="text-xl font-semibold mb-6">영상 관리</h3>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">YouTube API 상태</h4>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">API 키: AIzaSyBFCq...ZeEV6Q</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">사용량: 2,450/10,000</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-medium mb-3">오산대광교회 채널</h5>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span class="text-sm">최신 영상 수: 12개</span>
+                                        <button class="text-indigo-600 hover:text-indigo-800 text-sm">새로고침</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="font-medium mb-3">DGM TV 채널</h5>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span class="text-sm">최신 영상 수: 8개</span>
+                                        <button class="text-indigo-600 hover:text-indigo-800 text-sm">새로고침</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 페이지 수정 -->
+                <div id="pages" class="tab-content">
+                    <h3 class="text-xl font-semibold mb-6">페이지 수정</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h4 class="font-medium mb-4">메인 배너 텍스트</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">메인 제목</label>
+                                    <input type="text" id="mainTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="믿음과 소망, 그리고 사랑">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">서브 제목</label>
+                                    <input type="text" id="subTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="영감을 주는 이야기와 음악이 만나는 곳">
+                                </div>
+                                <button onclick="updateMainBanner()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                    배너 텍스트 업데이트
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h4 class="font-medium mb-4">연락처 정보</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+                                    <input type="text" id="phoneNumber" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="031-377-0675">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                                    <input type="email" id="emailAddress" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="derek1817@naver.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
+                                    <input type="text" id="address" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="경기도 오산시 궐리사로46번길 60-5">
+                                </div>
+                                <button onclick="updateContact()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                    연락처 업데이트
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 팝업 관리 -->
+                <div id="popup" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">팝업 관리</h3>
+                        <button onclick="showPopupEditor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-plus mr-2"></i>새 팝업 생성
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">활성 팝업</h4>
+                            </div>
+                            <div id="popupList" class="p-6">
+                                <!-- 팝업 목록 -->
+                            </div>
+                        </div>
+
+                        <div id="popupEditor" class="bg-white rounded-lg shadow" style="display: none;">
+                            <div class="p-6 border-b">
+                                <h4 class="font-medium">팝업 생성/수정</h4>
+                            </div>
+                            <div class="p-6">
+                                <form id="popupForm">
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">팝업 제목</label>
+                                        <input type="text" id="popupTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+                                        <textarea id="popupContent" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4" required></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="popupEnabled" class="mr-2">
+                                            <span class="text-sm">팝업 활성화</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex space-x-3">
+                                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                            저장
+                                        </button>
+                                        <button type="button" onclick="cancelPopupEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                                            취소
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 설정 -->
+                <div id="settings" class="tab-content">
+                    <h3 class="text-xl font-semibold mb-6">설정</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h4 class="font-medium mb-4">GitHub 연동 설정</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">GitHub Token</label>
+                                    <input type="password" id="githubToken" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Repository</label>
+                                    <input type="text" id="githubRepo" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="osandaegwang/osandaegwang.github.io">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
+                                    <input type="text" id="githubBranch" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="main">
+                                </div>
+                                <button onclick="testGitHubConnection()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                                    <i class="fab fa-github mr-2"></i>연결 테스트
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h4 class="font-medium mb-4">백업 및 복원</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <p class="font-medium">자동 백업</p>
+                                        <p class="text-sm text-gray-600">매일 자정에 자동 백업</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="space-y-2">
+                                    <button onclick="createBackup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                                        <i class="fas fa-download mr-2"></i>수동 백업 생성
+                                    </button>
+                                    <button onclick="restoreBackup()" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md">
+                                        <i class="fas fa-upload mr-2"></i>백업 복원
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 미리보기 -->
+                <div id="preview" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">홈페이지 미리보기</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="refreshPreview()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                                <i class="fas fa-sync mr-2"></i>새로고침
+                            </button>
+                            <button onclick="openInNewTab()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                                <i class="fas fa-external-link-alt mr-2"></i>새 탭에서 열기
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <iframe id="previewFrame" class="preview-iframe" src="about:blank"></iframe>
+                    </div>
+                </div>
+
+                    <!-- 푸터 관리 탭 -->
+                    <div id="footerManagement" class="tab-content">
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-semibold text-gray-800">
+                                    <i class="fas fa-edit mr-2"></i>푸터 메시지 관리
+                                </h3>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        푸터 메시지
+                                    </label>
+                                    <textarea 
+                                        id="footerText" 
+                                        rows="3" 
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+                                        placeholder="푸터에 표시할 메시지를 입력하세요..."
+                                    ></textarea>
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        홈페이지 하단에 표시될 교회 소개 메시지입니다.
+                                    </p>
+                                </div>
+
+                                <div class="flex space-x-3">
+                                    <button 
+                                        onclick="saveFooterText()" 
+                                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+                                    >
+                                        <i class="fas fa-save mr-2"></i>저장
+                                    </button>
+                                    <button 
+                                        onclick="resetFooterText()" 
+                                        class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
+                                    >
+                                        <i class="fas fa-undo mr-2"></i>기본값으로 복원
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-medium text-gray-800 mb-2">미리보기</h4>
+                                <div class="text-sm text-gray-600 italic" id="footerPreview">
+                                    하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentUser = null;
+        let isGitHubConnected = false;
+        let editingItemId = null;
+
+        // 데이터 저장소 (실제로는 localStorage 사용)
+        const dataStore = {
+            news: [],
+            resources: {
+                articles: [],
+                papers: [],
+                downloads: []
+            },
+            popups: [],
+            settings: {
+                mainTitle: "믿음과 소망, 그리고 사랑",
+                subTitle: "영감을 주는 이야기와 음악이 만나는 곳",
+                phone: "031-377-0675",
+                email: "derek1817@naver.com",
+                address: "경기도 오산시 궐리사로46번길 60-5",
+                footerText: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"
+            }
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+    // 기본 이벤트 리스너 설정
+    setupEventListeners();
+
+    // 초기 데이터 로드 및 UI 업데이트
+    loadData();
+    updateNewsList();
+    updateResourcesList(); 
+    updatePopupsList();
+    loadFooterText();
+    setupFooterPreview();
+
+    // 동기화 시스템 초기화 (약간의 지연)
+    setTimeout(function() {
+        if (window.DGMTV_CMS) {
+            window.DGMTV_CMS.init();
+        }
+    }, 500);
+});
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            // 로그인 폼
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // 뉴스 폼
+            document.getElementById('newsForm').addEventListener('submit', handleNewsSave);
+            
+            // 자료 폼
+            document.getElementById('resourceForm').addEventListener('submit', handleResourceSave);
+            
+            // 팝업 폼
+            document.getElementById('popupForm').addEventListener('submit', handlePopupSave);
+            
+            // 사이드바 토글
+            document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+        }
+
+        // 방문자 통계 관리
+        function initVisitorStats() {
+            // 현재 날짜 가져오기 (YYYY-MM-DD 형식)
+            const today = new Date().toISOString().split('T')[0];
+
+            // 마지막 방문 날짜 확인
+            const lastVisitDate = localStorage.getItem('lastVisitDate');
+            let dailyCount = parseInt(localStorage.getItem('dailyVisitors') || '0');
+            let totalCount = parseInt(localStorage.getItem('totalVisitors') || '0');
+
+            // 새로운 날이면 일일 방문자 초기화
+            if (lastVisitDate !== today) {
+                dailyCount = 1;
+                localStorage.setItem('lastVisitDate', today);
+                localStorage.setItem('dailyVisitors', '1');
+            } else {
+                // 같은 날이면 세션 확인 (중복 방문 방지)
+                const sessionVisited = sessionStorage.getItem('sessionVisited');
+                if (!sessionVisited) {
+                    dailyCount++;
+                    localStorage.setItem('dailyVisitors', dailyCount.toString());
+                    sessionStorage.setItem('sessionVisited', 'true');
+                }
+            }
+
+            // 누적 방문자 (처음 방문이면 증가)
+            const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
+            if (!hasVisitedBefore) {
+                totalCount++;
+                localStorage.setItem('totalVisitors', totalCount.toString());
+                localStorage.setItem('hasVisitedBefore', 'true');
+            }
+
+            // 화면에 표시
+            updateVisitorDisplay();
+        }
+
+        function updateVisitorDisplay() {
+            const dailyCount = localStorage.getItem('dailyVisitors') || '0';
+            const totalCount = localStorage.getItem('totalVisitors') || '0';
+
+            const dailyElement = document.getElementById('dailyVisitors');
+            const totalElement = document.getElementById('totalVisitors');
+
+            if (dailyElement) dailyElement.textContent = dailyCount;
+            if (totalElement) totalElement.textContent = totalCount;
+        }
+
+        // 관리자 전용: 방문자 통계 초기화 함수
+        function resetVisitorStats() {
+            if (confirm('방문자 통계를 초기화하시겠습니까?')) {
+                localStorage.removeItem('dailyVisitors');
+                localStorage.removeItem('totalVisitors');
+                localStorage.removeItem('lastVisitDate');
+                localStorage.removeItem('hasVisitedBefore');
+                sessionStorage.removeItem('sessionVisited');
+                updateVisitorDisplay();
+                alert('방문자 통계가 초기화되었습니다.');
+            }
+
+
+        // 푸터 텍스트 관리 함수들
+        function loadFooterText() {
+            const footerTextElement = document.getElementById('footerText');
+            const footerPreviewElement = document.getElementById('footerPreview');
+
+            if (!dataStore.settings.footerText) {
+                dataStore.settings.footerText = "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회";
+            }
+
+            if (footerTextElement) {
+                footerTextElement.value = dataStore.settings.footerText;
+            }
+            if (footerPreviewElement) {
+                footerPreviewElement.textContent = dataStore.settings.footerText;
+            }
+        }
+
+        function saveFooterText() {
+            const footerTextElement = document.getElementById('footerText');
+            const footerPreviewElement = document.getElementById('footerPreview');
+
+            if (footerTextElement) {
+                const newFooterText = footerTextElement.value.trim();
+                if (newFooterText) {
+                    dataStore.settings.footerText = newFooterText;
+                    if (footerPreviewElement) {
+                        footerPreviewElement.textContent = newFooterText;
+                    }
+                    saveData();
+                    showToast('푸터 메시지가 저장되었습니다!', 'success');
+                } else {
+                    showToast('푸터 메시지를 입력해주세요.', 'error');
+                }
+            }
+        }
+
+        function resetFooterText() {
+            if (confirm('푸터 메시지를 기본값으로 복원하시겠습니까?')) {
+                const defaultText = "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회";
+                dataStore.settings.footerText = defaultText;
+
+                const footerTextElement = document.getElementById('footerText');
+                const footerPreviewElement = document.getElementById('footerPreview');
+
+                if (footerTextElement) {
+                    footerTextElement.value = defaultText;
+                }
+                if (footerPreviewElement) {
+                    footerPreviewElement.textContent = defaultText;
+                }
+
+                saveData();
+                showToast('푸터 메시지가 기본값으로 복원되었습니다!', 'success');
+            }
+        }
+
+        // 실시간 미리보기 업데이트
+        function setupFooterPreview() {
+            const footerTextElement = document.getElementById('footerText');
+            const footerPreviewElement = document.getElementById('footerPreview');
+
+            if (footerTextElement && footerPreviewElement) {
+                footerTextElement.addEventListener('input', function() {
+                    const text = this.value.trim() || "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회";
+                    footerPreviewElement.textContent = text;
+                });
+            }
+        }
+        }
+
+        // 로그인 처리
+        function handleLogin(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            console.log('로그인 시도:', username); // 디버그용
+
+            // 사용자 인증
+            const validUsers = {
+                'admin': 'dgmtv2025',
+                'editor': 'editor123', 
+                'viewer': 'viewer123'
+            };
+
+            if (!username || !password) {
+                showToast('사용자명과 비밀번호를 입력해주세요.', 'error');
+                return;
+            }
+
+            if (validUsers[username] === password) {
+                // 로그인 성공
+                currentUser = { 
+                    username: username, 
+                    role: username,
+                    loginTime: new Date().toISOString()
+                };
+
+                // 사용자 정보 표시 업데이트
+                const userDisplay = document.getElementById('userDisplay');
+                if (userDisplay) {
+                    userDisplay.textContent = username;
+                }
+
+                // 로그인 모달 닫기
+                const loginModal = document.getElementById('loginModal');
+                if (loginModal) {
+                    loginModal.classList.remove('show');
+                }
+
+                // 성공 메시지
+                showToast('로그인 성공!', 'success');
+
+                // 대시보드 업데이트
+                if (typeof updateDashboard === 'function') {
+                    updateDashboard();
+                }
+
+                // 방문자 통계 업데이트
+                if (typeof initVisitorStats === 'function') {
+                    initVisitorStats();
+                }
+
+                console.log('로그인 완료:', currentUser);
+
+            } else {
+                showToast('로그인 실패: 잘못된 사용자명 또는 비밀번호', 'error');
+                console.log('로그인 실패:', username);
+            }
+        };
+            
+            if (validUsers[username] === password) {
+                currentUser = { username, role: username };
+                document.getElementById('userDisplay').textContent = username;
+                closeModal('loginModal');
+                showToast('로그인 성공!', 'success');
+                updateDashboard();
+            } else {
+                showToast('로그인 실패: 잘못된 사용자명 또는 비밀번호', 'error');
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            currentUser = null;
+
+            // 로그인 모달 다시 표시
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.classList.add('show');
+            }
+
+            // 사용자 표시 초기화
+            const userDisplay = document.getElementById('userDisplay');
+            if (userDisplay) {
+                userDisplay.textContent = '';
+            }
+
+            showToast('로그아웃되었습니다.', 'success');
+            console.log('로그아웃 완료');
+        }
+
+        // 탭 전환
+        function showTab(tabName) {
+            // 모든 탭 컨텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 모든 메뉴 아이템 비활성화
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 선택된 탭 보이기
+            document.getElementById(tabName).classList.add('active');
+            
+            // 선택된 메뉴 아이템 활성화
+            event.target.closest('.menu-item').classList.add('active');
+            
+            // 페이지 제목 업데이트
+            const titles = {
+                dashboard: '대시보드',
+                news: '뉴스 관리',
+                resources: '자료 관리',
+                videos: '영상 관리',
+                pages: '페이지 수정',
+                popup: '팝업 관리',
+                settings: '설정',
+                preview: '미리보기'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabName] || tabName;
+            
+            // 특별한 초기화가 필요한 탭들
+            if (tabName === 'preview') {
+                loadPreview();
+            }
+        }
+
+        // 뉴스 관리
+        function showNewsEditor() {
+            document.getElementById('newsEditor').style.display = 'block';
+            document.getElementById('newsForm').reset();
+            document.getElementById('newsDate').value = new Date().toISOString().split('T')[0];
+            editingItemId = null;
+        }
+
+        function cancelNewsEdit() {
+            document.getElementById('newsEditor').style.display = 'none';
+            editingItemId = null;
+        }
+
+        function handleNewsSave(e) {
+            e.preventDefault();
+            
+            const newsData = {
+                id: editingItemId || Date.now().toString(),
+                title: document.getElementById('newsTitle').value,
+                category: document.getElementById('newsCategory').value,
+                content: document.getElementById('newsContent').value,
+                date: document.getElementById('newsDate').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editingItemId) {
+                const index = dataStore.news.findIndex(item => item.id === editingItemId);
+                if (index !== -1) {
+                    dataStore.news[index] = newsData;
+                }
+            } else {
+                dataStore.news.unshift(newsData);
+            }
+            
+            saveData();
+            updateNewsList();
+            cancelNewsEdit();
+            showToast(`뉴스가 ${editingItemId ? '수정' : '추가'}되었습니다!`, 'success');
+            updateDashboard();
+            
+            // 홈페이지에 즉시 반영
+            updateHomepageNews();
+        }
+
+        function editNews(id) {
+            const news = dataStore.news.find(item => item.id === id);
+            if (news) {
+                document.getElementById('newsTitle').value = news.title;
+                document.getElementById('newsCategory').value = news.category;
+                document.getElementById('newsContent').value = news.content;
+                document.getElementById('newsDate').value = news.date;
+                editingItemId = id;
+                showNewsEditor();
+            }
+        }
+
+        function deleteNews(id) {
+            if (confirm('정말로 이 뉴스를 삭제하시겠습니까?')) {
+                dataStore.news = dataStore.news.filter(item => item.id !== id);
+                saveData();
+                updateNewsList();
+                showToast('뉴스가 삭제되었습니다.', 'success');
+                updateDashboard();
+                updateHomepageNews();
+            }
+        }
+
+        function updateNewsList() {
+            const newsList = document.getElementById('newsList');
+            newsList.innerHTML = '';
+            
+            if (dataStore.news.length === 0) {
+                newsList.innerHTML = '<p class="text-gray-500 text-center">등록된 뉴스가 없습니다.</p>';
+                return;
+            }
+            
+            dataStore.news.forEach(news => {
+                const newsItem = document.createElement('div');
+                newsItem.className = 'border-b pb-4 mb-4 last:border-b-0';
+                newsItem.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="px-2 py-1 text-xs rounded-full bg-${getCategoryColor(news.category)}-100 text-${getCategoryColor(news.category)}-800">
+                                    ${news.category}
+                                </span>
+                                <span class="text-sm text-gray-500">${news.date}</span>
+                            </div>
+                            <h5 class="font-medium text-gray-800 mb-1">${news.title}</h5>
+                            <p class="text-sm text-gray-600 line-clamp-2">${news.content}</p>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button onclick="editNews('${news.id}')" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteNews('${news.id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                newsList.appendChild(newsItem);
+            });
+        }
+
+        // 자료 관리
+        function showResourceEditor() {
+            document.getElementById('resourceEditor').style.display = 'block';
+            document.getElementById('resourceForm').reset();
+            editingItemId = null;
+        }
+
+        function cancelResourceEdit() {
+            document.getElementById('resourceEditor').style.display = 'none';
+            editingItemId = null;
+        }
+
+        function handleResourceSave(e) {
+            e.preventDefault();
+            
+            const resourceData = {
+                id: editingItemId || Date.now().toString(),
+                title: document.getElementById('resourceTitle').value,
+                category: document.getElementById('resourceCategory').value,
+                url: document.getElementById('resourceUrl').value,
+                description: document.getElementById('resourceDescription').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            const category = resourceData.category;
+            
+            if (editingItemId) {
+                const index = dataStore.resources[category].findIndex(item => item.id === editingItemId);
+                if (index !== -1) {
+                    dataStore.resources[category][index] = resourceData;
+                }
+            } else {
+                dataStore.resources[category].unshift(resourceData);
+            }
+            
+            saveData();
+            updateResourcesList();
+            cancelResourceEdit();
+            showToast(`자료가 ${editingItemId ? '수정' : '추가'}되었습니다!`, 'success');
+            updateDashboard();
+            
+            // 홈페이지에 즉시 반영
+            updateHomepageResources();
+        }
+
+        function updateResourcesList() {
+            const categories = ['articles', 'papers', 'downloads'];
+            const containerIds = ['articlesList', 'papersList', 'downloadsList'];
+            
+            categories.forEach((category, index) => {
+                const container = document.getElementById(containerIds[index]);
+                container.innerHTML = '';
+                
+                const resources = dataStore.resources[category];
+                
+                if (resources.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center text-sm">등록된 자료가 없습니다.</p>';
+                    return;
+                }
+                
+                resources.forEach(resource => {
+                    const resourceItem = document.createElement('div');
+                    resourceItem.className = 'border-b pb-3 mb-3 last:border-b-0';
+                    resourceItem.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h6 class="font-medium text-sm text-gray-800 mb-1">${resource.title}</h6>
+                                <p class="text-xs text-gray-600 mb-2">${resource.description || ''}</p>
+                                <a href="${resource.url}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-external-link-alt mr-1"></i>링크 열기
+                                </a>
+                            </div>
+                            <button onclick="deleteResource('${category}', '${resource.id}')" class="text-red-600 hover:text-red-800 ml-2">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(resourceItem);
+                });
+            });
+        }
+
+        function deleteResource(category, id) {
+            if (confirm('정말로 이 자료를 삭제하시겠습니까?')) {
+                dataStore.resources[category] = dataStore.resources[category].filter(item => item.id !== id);
+                saveData();
+                updateResourcesList();
+                showToast('자료가 삭제되었습니다.', 'success');
+                updateDashboard();
+                updateHomepageResources();
+            }
+        }
+
+        // 팝업 관리
+        function showPopupEditor() {
+            document.getElementById('popupEditor').style.display = 'block';
+            document.getElementById('popupForm').reset();
+            editingItemId = null;
+        }
+
+        function cancelPopupEdit() {
+            document.getElementById('popupEditor').style.display = 'none';
+            editingItemId = null;
+        }
+
+        function handlePopupSave(e) {
+            e.preventDefault();
+            
+            const popupData = {
+                id: editingItemId || Date.now().toString(),
+                title: document.getElementById('popupTitle').value,
+                content: document.getElementById('popupContent').value,
+                enabled: document.getElementById('popupEnabled').checked,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editingItemId) {
+                const index = dataStore.popups.findIndex(item => item.id === editingItemId);
+                if (index !== -1) {
+                    dataStore.popups[index] = popupData;
+                }
+            } else {
+                dataStore.popups.unshift(popupData);
+            }
+            
+            saveData();
+            updatePopupsList();
+            cancelPopupEdit();
+            showToast(`팝업이 ${editingItemId ? '수정' : '생성'}되었습니다!`, 'success');
+            
+            // 홈페이지에 즉시 반영
+            updateHomepagePopups();
+        }
+
+        function updatePopupsList() {
+            const popupList = document.getElementById('popupList');
+            popupList.innerHTML = '';
+            
+            if (dataStore.popups.length === 0) {
+                popupList.innerHTML = '<p class="text-gray-500 text-center">등록된 팝업이 없습니다.</p>';
+                return;
+            }
+            
+            dataStore.popups.forEach(popup => {
+                const popupItem = document.createElement('div');
+                popupItem.className = 'border-b pb-4 mb-4 last:border-b-0';
+                popupItem.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="w-3 h-3 rounded-full ${popup.enabled ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                                <span class="text-sm ${popup.enabled ? 'text-green-600' : 'text-gray-500'}">
+                                    ${popup.enabled ? '활성' : '비활성'}
+                                </span>
+                            </div>
+                            <h5 class="font-medium text-gray-800 mb-1">${popup.title}</h5>
+                            <p class="text-sm text-gray-600">${popup.content}</p>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button onclick="editPopup('${popup.id}')" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deletePopup('${popup.id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                popupList.appendChild(popupItem);
+            });
+        }
+
+        function editPopup(id) {
+            const popup = dataStore.popups.find(item => item.id === id);
+            if (popup) {
+                document.getElementById('popupTitle').value = popup.title;
+                document.getElementById('popupContent').value = popup.content;
+                document.getElementById('popupEnabled').checked = popup.enabled;
+                editingItemId = id;
+                showPopupEditor();
+            }
+        }
+
+        function deletePopup(id) {
+            if (confirm('정말로 이 팝업을 삭제하시겠습니까?')) {
+                dataStore.popups = dataStore.popups.filter(item => item.id !== id);
+                saveData();
+                updatePopupsList();
+                showToast('팝업이 삭제되었습니다.', 'success');
+                updateHomepagePopups();
+            }
+        }
+
+        // 페이지 수정
+        function updateMainBanner() {
+            dataStore.settings.mainTitle = document.getElementById('mainTitle').value;
+            dataStore.settings.subTitle = document.getElementById('subTitle').value;
+            saveData();
+            showToast('메인 배너가 업데이트되었습니다!', 'success');
+            updateHomepageBanner();
+        }
+
+        function updateContact() {
+            dataStore.settings.phone = document.getElementById('phoneNumber').value;
+            dataStore.settings.email = document.getElementById('emailAddress').value;
+            dataStore.settings.address = document.getElementById('address').value;
+            saveData();
+            showToast('연락처 정보가 업데이트되었습니다!', 'success');
+            updateHomepageContact();
+        }
+
+        // GitHub 연동
+        function testGitHubConnection() {
+            const token = document.getElementById('githubToken').value;
+            const repo = document.getElementById('githubRepo').value;
+            
+            if (!token || !repo) {
+                showToast('GitHub Token과 Repository를 입력해주세요.', 'error');
+                return;
+            }
+            
+            // GitHub API 테스트
+            fetch(`https://api.github.com/repos/${repo}`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    isGitHubConnected = true;
+                    document.getElementById('githubStatus').className = 'px-3 py-1 rounded-full text-sm github-connected';
+                    document.getElementById('githubStatus').innerHTML = '<i class="fab fa-github mr-2"></i>GitHub 연결됨';
+                    showToast('GitHub 연결 성공!', 'success');
+                    localStorage.setItem('githubToken', token);
+                    localStorage.setItem('githubRepo', repo);
+                } else {
+                    throw new Error('연결 실패');
+                }
+            })
+            .catch(error => {
+                showToast('GitHub 연결 실패: ' + error.message, 'error');
+            });
+        }
+
+        // 홈페이지 실시간 업데이트 함수들
+        function updateHomepageNews() {
+            console.log('뉴스 업데이트됨:', dataStore.news);
+            // 실제로는 GitHub API를 통해 홈페이지 HTML 파일을 수정
+            if (isGitHubConnected) {
+                commitToGitHub('뉴스 업데이트', generateNewsHTML());
+            }
+        }
+
+        function updateHomepageResources() {
+            console.log('자료 업데이트됨:', dataStore.resources);
+            if (isGitHubConnected) {
+                commitToGitHub('자료실 업데이트', generateResourcesHTML());
+            }
+        }
+
+        function updateHomepagePopups() {
+            console.log('팝업 업데이트됨:', dataStore.popups);
+            if (isGitHubConnected) {
+                commitToGitHub('팝업 업데이트', generatePopupJS());
+            }
+        }
+
+        function updateHomepageBanner() {
+            console.log('배너 업데이트됨:', dataStore.settings);
+            if (isGitHubConnected) {
+                commitToGitHub('메인 배너 업데이트', generateBannerHTML());
+            }
+        }
+
+        function updateHomepageContact() {
+            console.log('연락처 업데이트됨:', dataStore.settings);
+            if (isGitHubConnected) {
+                commitToGitHub('연락처 정보 업데이트', generateContactHTML());
+            }
+        }
+
+        // GitHub 커밋 함수
+        async function commitToGitHub(message, content) {
+            const token = localStorage.getItem('githubToken');
+            const repo = localStorage.getItem('githubRepo');
+            
+            if (!token || !repo) {
+                showToast('GitHub 설정을 먼저 완료해주세요.', 'warning');
+                return;
+            }
+            
+            try {
+                // 실제 GitHub API 호출로 파일 업데이트
+                const response = await fetch(`https://api.github.com/repos/${repo}/contents/index.html`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `[CMS] ${message}`,
+                        content: btoa(unescape(encodeURIComponent(content))),
+                        sha: await getFileSHA(repo, 'index.html', token)
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('홈페이지가 업데이트되었습니다!', 'success');
+                } else {
+                    throw new Error('GitHub 업데이트 실패');
+                }
+            } catch (error) {
+                console.error('GitHub 업데이트 오류:', error);
+                showToast('홈페이지 업데이트에 실패했습니다.', 'error');
+            }
+        }
+
+        async function getFileSHA(repo, path, token) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                });
+                const data = await response.json();
+                return data.sha;
+            } catch (error) {
+                console.error('SHA 가져오기 실패:', error);
+                return null;
+            }
+        }
+
+        // HTML 생성 함수들
+        function generateNewsHTML() {
+            let newsHTML = '';
+            dataStore.news.slice(0, 3).forEach(news => {
+                const categoryColor = getCategoryColor(news.category);
+                newsHTML += `
+                    <article class="bg-gray-50 rounded-lg overflow-hidden shadow-md">
+                        <div class="h-48 bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-4xl text-white"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center mb-2">
+                                <span class="bg-${categoryColor}-100 text-${categoryColor}-800 text-xs px-2 py-1 rounded-full">${news.category}</span>
+                                <span class="text-gray-500 text-sm ml-2">${news.date}</span>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-3">${news.title}</h3>
+                            <p class="text-gray-600 text-sm mb-4">${news.content.substring(0, 100)}...</p>
+                            <a href="#" class="text-indigo-600 text-sm font-semibold hover:text-indigo-800">자세히 보기</a>
+                        </div>
+                    </article>
+                `;
+            });
+            return newsHTML;
+        }
+
+        function generateResourcesHTML() {
+            // 자료실 HTML 생성 로직
+            return '<div>자료실 업데이트 완료</div>';
+        }
+
+        function generatePopupJS() {
+            // 팝업 JavaScript 생성 로직
+            const activePopup = dataStore.popups.find(popup => popup.enabled);
+            if (activePopup) {
+                return `
+                    const popupData = {
+                        title: "${activePopup.title}",
+                        content: "${activePopup.content}",
+                        enabled: true
+                    };
+                    localStorage.setItem('sitePopup', JSON.stringify(popupData));
+                `;
+            }
+            return '';
+        }
+
+        function generateBannerHTML() {
+            return `
+                <h2 class="text-4xl md:text-6xl font-bold mb-6">${dataStore.settings.mainTitle}</h2>
+                <p class="text-xl md:text-2xl mb-8">${dataStore.settings.subTitle}</p>
+            `;
+        }
+
+        function generateContactHTML() {
+            return `
+                <li><i class="fas fa-phone mr-2"></i><a href="tel:${dataStore.settings.phone}">${dataStore.settings.phone}</a></li>
+                <li><i class="fas fa-envelope mr-2"></i><a href="mailto:${dataStore.settings.email}">${dataStore.settings.email}</a></li>
+                <li><i class="fas fa-map-marker-alt mr-2"></i>${dataStore.settings.address}</li>
+                <li class="mt-4 pt-4 border-t border-gray-300"><i class="fas fa-heart mr-2 text-red-500"></i>${dataStore.settings.footerText || "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"}</li>
+            `;
+        }
+
+        // 미리보기
+        function loadPreview() {
+            const previewFrame = document.getElementById('previewFrame');
+            // 실제 홈페이지 URL 또는 생성된 HTML을 표시
+            previewFrame.src = 'https://osandaekwang.github.io/';
+        }
+
+        function refreshPreview() {
+            const previewFrame = document.getElementById('previewFrame');
+            previewFrame.src = previewFrame.src;
+            showToast('미리보기가 새로고침되었습니다.', 'success');
+        }
+
+        function openInNewTab() {
+            window.open('https://osandaekwang.github.io/', '_blank');
+        }
+
+        // 대시보드 업데이트
+        function updateDashboard() {
+            document.getElementById('totalNews').textContent = dataStore.news.length;
+            
+            const totalResources = Object.values(dataStore.resources).reduce((sum, arr) => sum + arr.length, 0);
+            document.getElementById('totalResources').textContent = totalResources;
+            
+            document.getElementById('lastBackup').textContent = new Date().toLocaleString('ko-KR');
+            
+            updateNewsList();
+            updateResourcesList();
+            updatePopupsList();
+            loadFooterText();
+            setupFooterPreview();
+        }
+
+        // 유틸리티 함수들
+        function getCategoryColor(category) {
+            const colors = {
+                '중요': 'red',
+                '행사': 'green',
+                '예정': 'blue',
+                '일반': 'gray'
+            };
+            return colors[category] || 'gray';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                console.log('모달 닫힘:', modalId);
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+        }
+
+        function saveAll() {
+            saveData();
+            if (isGitHubConnected) {
+                commitToGitHub('전체 업데이트', generateFullHTML());
+                showToast('모든 변경사항이 저장되고 홈페이지에 반영되었습니다!', 'success');
+            } else {
+                showToast('로컬에 저장되었습니다. GitHub 연결 후 홈페이지에 반영할 수 있습니다.', 'warning');
+            }
+        }
+
+        function generateFullHTML() {
+            // 전체 홈페이지 HTML 생성
+            return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오산대광교회 & DGM TV</title>
+    <!-- 스타일과 스크립트는 기존과 동일 -->
+    <script>
+
+// 공통 데이터 구조 및 동기화 시스템
+window.DGMTV_SHARED = window.DGMTV_SHARED || {
+    // 데이터 키 상수
+    KEYS: {
+        NEWS: 'dgmtv_news',
+        RESOURCES: 'dgmtv_resources', 
+        FOOTER_TEXT: 'dgmtv_footer_text',
+        VISITOR_STATS: 'dgmtv_visitor_stats',
+        SETTINGS: 'dgmtv_settings',
+        LAST_UPDATE: 'dgmtv_last_update'
+    },
+
+    // 데이터 가져오기
+    getData: function(key, defaultValue = null) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : defaultValue;
+        } catch (e) {
+            console.error('데이터 읽기 오류:', e);
+            return defaultValue;
+        }
+    },
+
+    // 데이터 저장
+    setData: function(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            localStorage.setItem(this.KEYS.LAST_UPDATE, Date.now());
+            this.notifyUpdate(key, value);
+            return true;
+        } catch (e) {
+            console.error('데이터 저장 오류:', e);
+            return false;
+        }
+    },
+
+    // 업데이트 알림
+    notifyUpdate: function(key, value) {
+        // 다른 창/탭에 변경사항 알림
+        try {
+            window.dispatchEvent(new CustomEvent('dgmtv_data_update', {
+                detail: { key: key, value: value, timestamp: Date.now() }
+            }));
+        } catch (e) {
+            console.error('업데이트 알림 오류:', e);
+        }
+    },
+
+    // 실시간 동기화 설정
+    setupSync: function(callback) {
+        // localStorage 변경 감지
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('dgmtv_')) {
+                if (callback) callback(e.key, e.newValue);
+            }
+        });
+
+        // 같은 창에서의 변경사항 감지
+        window.addEventListener('dgmtv_data_update', function(e) {
+            if (callback) callback(e.detail.key, e.detail.value);
+        });
+    },
+
+    // 초기 데이터 설정
+    initializeData: function() {
+        // 기본 뉴스 데이터
+        if (!this.getData(this.KEYS.NEWS)) {
+            this.setData(this.KEYS.NEWS, []);
+        }
+
+        // 기본 자료 데이터
+        if (!this.getData(this.KEYS.RESOURCES)) {
+            this.setData(this.KEYS.RESOURCES, []);
+        }
+
+        // 기본 푸터 텍스트
+        if (!this.getData(this.KEYS.FOOTER_TEXT)) {
+            this.setData(this.KEYS.FOOTER_TEXT, "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회");
+        }
+
+        // 기본 방문자 통계
+        if (!this.getData(this.KEYS.VISITOR_STATS)) {
+            this.setData(this.KEYS.VISITOR_STATS, {
+                daily: 0,
+                total: 0,
+                lastVisitDate: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        // 기본 설정
+        if (!this.getData(this.KEYS.SETTINGS)) {
+            this.setData(this.KEYS.SETTINGS, {
+                siteName: "오산대광교회",
+                description: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회",
+                phone: "031-377-0675",
+                email: "derek1817@naver.com",
+                address: "경기도 오산시 궐리사로46번길 60-5"
+            });
+        }
+    }
+};
+
+// 초기화
+window.DGMTV_SHARED.initializeData();
+
+</script>
+    <script>
+
+// CMS 데이터 동기화 시스템
+window.DGMTV_CMS = {
+    // 기존 dataStore를 공통 저장소와 연동
+    syncDataStore: function() {
+        if (typeof dataStore !== 'undefined') {
+            // 기존 dataStore의 데이터를 공통 저장소에 저장
+            if (dataStore.news) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.NEWS, dataStore.news);
+            }
+            if (dataStore.resources) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.RESOURCES, dataStore.resources);
+            }
+            if (dataStore.settings && dataStore.settings.footerText) {
+                window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT, dataStore.settings.footerText);
+            }
+        }
+    },
+
+    // 공통 저장소에서 dataStore로 데이터 로드
+    loadFromSharedStorage: function() {
+        if (typeof dataStore !== 'undefined') {
+            const news = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.NEWS, []);
+            const resources = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.RESOURCES, []);
+            const footerText = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT);
+
+            if (news) dataStore.news = news;
+            if (resources) dataStore.resources = resources;
+            if (footerText && dataStore.settings) {
+                dataStore.settings.footerText = footerText;
+            }
+        }
+    },
+
+    // 기존 저장 함수 확장
+    extendSaveData: function() {
+        if (typeof saveData === 'function') {
+            const originalSaveData = saveData;
+            window.saveData = function() {
+                // 기존 저장 실행
+                const result = originalSaveData.apply(this, arguments);
+
+                // 공통 저장소에도 저장
+                window.DGMTV_CMS.syncDataStore();
+
+                return result;
+            };
+        }
+    },
+
+    // 뉴스 저장 함수 확장
+    extendNewsSave: function() {
+        if (typeof handleNewsSave === 'function') {
+            const originalHandleNewsSave = handleNewsSave;
+            window.handleNewsSave = function() {
+                // 기존 저장 실행
+                const result = originalHandleNewsSave.apply(this, arguments);
+
+                // 공통 저장소에 뉴스 데이터 저장
+                if (typeof dataStore !== 'undefined' && dataStore.news) {
+                    window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.NEWS, dataStore.news);
+                }
+
+                return result;
+            };
+        }
+    },
+
+    // 푸터 저장 함수 확장
+    extendFooterSave: function() {
+        if (typeof saveFooterText === 'function') {
+            const originalSaveFooterText = saveFooterText;
+            window.saveFooterText = function() {
+                // 기존 저장 실행
+                const result = originalSaveFooterText.apply(this, arguments);
+
+                // 공통 저장소에 푸터 텍스트 저장
+                if (typeof dataStore !== 'undefined' && dataStore.settings && dataStore.settings.footerText) {
+                    window.DGMTV_SHARED.setData(window.DGMTV_SHARED.KEYS.FOOTER_TEXT, dataStore.settings.footerText);
+                }
+
+                return result;
+            };
+        }
+    },
+
+    // 방문자 통계 연동
+    syncVisitorStats: function() {
+        const sharedStats = window.DGMTV_SHARED.getData(window.DGMTV_SHARED.KEYS.VISITOR_STATS, {
+            daily: 0,
+            total: 0,
+            lastVisitDate: new Date().toISOString().split('T')[0]
+        });
+
+        // CMS 대시보드에 방문자 통계 표시
+        const dailyElement = document.getElementById('dailyVisitors');
+        const totalElement = document.getElementById('totalVisitors');
+
+        if (dailyElement) dailyElement.textContent = sharedStats.daily;
+        if (totalElement) totalElement.textContent = sharedStats.total;
+    },
+
+    // 실시간 동기화 설정
+    setupRealtimeSync: function() {
+        // 다른 창에서의 변경사항 감지
+        window.DGMTV_SHARED.setupSync((key, value) => {
+            if (key === window.DGMTV_SHARED.KEYS.VISITOR_STATS) {
+                this.syncVisitorStats();
+            }
+
+            // 기존 UI 업데이트 함수들 호출
+            if (typeof updateNewsList === 'function') {
+                updateNewsList();
+            }
+            if (typeof updateResourcesList === 'function') {
+                updateResourcesList();
+            }
+        });
+
+        // 주기적 동기화 (10초마다)
+        setInterval(() => {
+            this.syncVisitorStats();
+        }, 10000);
+    },
+
+    // 초기화
+    init: function() {
+        // 기존 함수들 확장
+        this.extendSaveData();
+        this.extendNewsSave();
+        this.extendFooterSave();
+
+        // 공통 저장소에서 데이터 로드
+        this.loadFromSharedStorage();
+
+        // 실시간 동기화 설정
+        this.setupRealtimeSync();
+
+        // 방문자 통계 동기화
+        this.syncVisitorStats();
+
+        console.log('DGMTV CMS 동기화 시스템 초기화 완료');
+    }
+};
+
+// CMS 로드 완료 후 초기화 (약간의 지연을 두어 기존 스크립트 로드 대기)
+document.addEventListener('DOMContentLoaded', function() {
+    // 기본 이벤트 리스너 설정
+    setupEventListeners();
+
+    // 초기 데이터 로드 및 UI 업데이트
+    loadData();
+    updateNewsList();
+    updateResourcesList(); 
+    updatePopupsList();
+    loadFooterText();
+    setupFooterPreview();
+
+    // 동기화 시스템 초기화 (약간의 지연)
+    setTimeout(function() {
+        if (window.DGMTV_CMS) {
+            window.DGMTV_CMS.init();
+        }
+    }, 500);
+});
+
+</script>
+</head>
+<body>
+    <!-- 생성된 컨텐츠들 -->
+    ${generateBannerHTML()}
+    ${generateNewsHTML()}
+    ${generateResourcesHTML()}
+    ${generateContactHTML()}
+</body>
+</html>`;
+        }
+
+        // 데이터 저장/로드
+        function saveData() {
+            try {
+                localStorage.setItem('churchCMSData', JSON.stringify(dataStore));
+                console.log('데이터 저장 완료');
+            } catch (error) {
+                console.error('데이터 저장 실패:', error);
+                showToast('데이터 저장에 실패했습니다.', 'error');
+            }
+        }
+
+        function loadData() {
+            try {
+                const savedData = localStorage.getItem('churchCMSData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    Object.assign(dataStore, parsedData);
+                    console.log('저장된 데이터 로드 완료');
+                    
+                    // UI 업데이트
+                    document.getElementById('mainTitle').value = dataStore.settings.mainTitle;
+                    document.getElementById('subTitle').value = dataStore.settings.subTitle;
+                    document.getElementById('phoneNumber').value = dataStore.settings.phone;
+                    document.getElementById('emailAddress').value = dataStore.settings.email;
+                    document.getElementById('address').value = dataStore.settings.address;
+                }
+            } catch (error) {
+                console.error('데이터 로드 실패:', error);
+            }
+        }
+
+        // 백업 관련 함수들
+        function createBackup() {
+            const backupData = {
+                timestamp: new Date().toISOString(),
+                data: dataStore
+            };
+            
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `church_cms_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('백업 파일이 다운로드되었습니다.', 'success');
+        }
+
+        function restoreBackup() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const backupData = JSON.parse(e.target.result);
+                            Object.assign(dataStore, backupData.data);
+                            saveData();
+                            updateDashboard();
+                            showToast('백업이 복원되었습니다.', 'success');
+                        } catch (error) {
+                            showToast('백업 파일이 올바르지 않습니다.', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // GitHub 토큰 로드
+        document.addEventListener('DOMContentLoaded', function() {
+    // 기본 이벤트 리스너 설정
+    setupEventListeners();
+
+    // 초기 데이터 로드 및 UI 업데이트
+    loadData();
+    updateNewsList();
+    updateResourcesList(); 
+    updatePopupsList();
+    loadFooterText();
+    setupFooterPreview();
+
+    // 동기화 시스템 초기화 (약간의 지연)
+    setTimeout(function() {
+        if (window.DGMTV_CMS) {
+            window.DGMTV_CMS.init();
+        }
+    }, 500);
+});
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDuhcB2MtAb%2BSxZ3WcUsb6ap4LrIwO4%2BBOIANzFQAxfQi62KDSXlc%2FknqgT7B8AtfK2MOJzm22jRtDQF3IpAdgxsByHfhJi%2B3dJupbh1ZSXZBKSNxWG7eQG9yEXbBu2NTpE8AuEf4OfJ8Mu%2Fi6Cwhc8Zpon92jh3%2FqMeSBm8xMCQarewYnlNd4%2BnygOwdmSJzps61ADAwiKyIVmnau4W3o72XaFCkoIGsO8hJKo4Xnpfp%2B4e0Dfumuoem%2FymqVbZ48pvggBkm2hIK9ujzrfMkRYXOcrIBbUxTDduO1fA4gmN15ITpwIaOHd%2FK1KuPfxDwGZmzH1KumE81vsNrMCq8mEIPuQURWNgpkcSOe8SyTktMcteU1Rw9H1UKgAsk0tGLPc0AiS83oGUEzmEK%2FBMxZeUWbPkfsTqtvrOVQ%2FxL7U7iMmLtooIY%2FQhu%2FB5pZ%2BMc1xRkYN1EkASaZadzjjq4WORNid623xa7QKw3JPN4CMKYW1x18wnzNbQ%2BnUKqlrqfiQ%3D%3D";
+        window.__genspark_locale = "ko-KR";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDuhcB2MtAb+SxZ3WcUsb6ap4LrIwO4+BOIANzFQAxfQi62KDSXlc/knqgT7B8AtfK2MOJzm22jRtDQF3IpAdgxsByHfhJi+3dJupbh1ZSXZBKSNxWG7eQG9yEXbBu2NTpE8AuEf4OfJ8Mu/i6Cwhc8Zpon92jh3/qMeSBm8xMCQarewYnlNd4+nygOwdmSJzps61ADAwiKyIVmnau4W3o72XaFCkoIGsO8hJKo4Xnpfp+4e0Dfumuoem/ymqVbZ48pvggBkm2hIK9ujzrfMkRYXOcrIBbUxTDduO1fA4gmN15ITpwIaOHd/K1KuPfxDwGZmzH1KumE81vsNrMCq8mEIPuQURWNgpkcSOe8SyTktMcteU1Rw9H1UKgAsk0tGLPc0AiS83oGUEzmEK/BMxZeUWbPkfsTqtvrOVQ/xL7U7iMmLtooIY/Qhu/B5pZ+Mc1xRkYN1EkASaZadzjjq4WORNid623xa7QKw3JPN4CMKYW1x18wnzNbQ+nUKqlrqfiQ==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
