@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: osandaekwang/dgmtv-website  # ⚠️ 여기를 실제 저장소명으로 변경
+  repo: osandaekwang/dgmtv-website
   branch: main
 
 media_folder: "assets/uploads"
