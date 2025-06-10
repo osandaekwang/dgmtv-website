@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오산대광교회 & DGM TV</title>
+    <title>오산대광교회 & DGM TV - Netlify CMS</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -328,6 +328,102 @@
             color: white;
             text-decoration: none;
         }
+
+        .cms-setup-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .file-code {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .news-date {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-content {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .tab-container {
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            border: none;
+            background: none;
+            color: #6b7280;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -343,9 +439,11 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-6">
                     <nav class="flex space-x-6">
+                        <a href="#home" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-home">홈</a>
                         <a href="#videos" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-videos">영상</a>
                         <a href="#news" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-news">뉴스</a>
                         <a href="#resources" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-resources">자료실</a>
+                        <a href="#cms-setup" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-cms">CMS 설정</a>
                     </nav>
                     
                     <!-- Desktop Language Toggle -->
@@ -358,9 +456,11 @@
             
             <!-- Mobile Navigation -->
             <div class="md:hidden mobile-nav">
+                <a href="#home" id="mobile-nav-home">홈</a>
                 <a href="#videos" id="mobile-nav-videos">영상</a>
                 <a href="#news" id="mobile-nav-news">뉴스</a>
                 <a href="#resources" id="mobile-nav-resources">자료실</a>
+                <a href="#cms-setup" id="mobile-nav-cms">CMS 설정</a>
             </div>
         </div>
     </header>
@@ -374,7 +474,7 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="hero-section text-white">
+    <section id="home" class="hero-section text-white">
         <div class="container mx-auto px-4 text-center">
             <div>
                 <div class="main-title-line1" id="main-title-line1">진리의 말씀, 사랑의 나눔</div>
@@ -430,10 +530,31 @@
     <!-- News Section -->
     <section id="news" class="section bg-white">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="news-section-title">기독교 뉴스</h2>
-            <div class="text-center py-12">
-                <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500" id="news-placeholder">뉴스 컨텐츠가 준비 중입니다.</p>
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="news-section-title">교회 소식</h2>
+            
+            <!-- Sample News Items -->
+            <div class="max-w-4xl mx-auto">
+                <div class="news-card">
+                    <div class="news-date">2025년 1월 12일</div>
+                    <div class="news-title">웹사이트 오픈 안내</div>
+                    <div class="news-content">
+                        오산대광교회 공식 웹사이트가 새롭게 오픈되었습니다. 앞으로 더욱 편리하게 교회 소식과 예배 정보를 확인하실 수 있습니다.
+                    </div>
+                </div>
+                
+                <div class="news-card">
+                    <div class="news-date">2025년 1월 10일</div>
+                    <div class="news-title">주일 예배 시간 안내</div>
+                    <div class="news-content">
+                        주일예배는 오전 11시, 오후예배는 오후 2시에 진행됩니다. 새벽기도회는 일요일 오전 4시에 있습니다.
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <p class="text-gray-500 italic" id="news-cms-note">
+                        ※ Netlify CMS 설정 완료 후 관리자 페이지에서 뉴스를 쉽게 작성하고 관리할 수 있습니다.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -441,10 +562,414 @@
     <!-- Resources Section -->
     <section id="resources" class="section bg-gray-50">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="resources-section-title">자료실</h2>
-            <div class="text-center py-12">
-                <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500" id="resources-placeholder">자료실 컨텐츠가 준비 중입니다.</p>
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="resources-section-title">교회 자료실</h2>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-bible text-4xl text-indigo-600 mb-2"></i>
+                            <h3 class="text-lg font-semibold text-gray-800">성경 연구 자료</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">
+                            매주 업데이트되는 성경 연구 자료와 설교 원고를 다운로드하실 수 있습니다.
+                        </p>
+                        <button class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                            자료 다운로드
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-music text-4xl text-green-600 mb-2"></i>
+                            <h3 class="text-lg font-semibold text-gray-800">찬양 악보</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">
+                            주일 예배와 특별 행사에서 사용되는 찬양 악보를 제공합니다.
+                        </p>
+                        <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition">
+                            악보 다운로드
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-calendar text-4xl text-purple-600 mb-2"></i>
+                            <h3 class="text-lg font-semibold text-gray-800">교회 달력</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">
+                            교회 행사 일정과 예배 시간표를 확인하실 수 있습니다.
+                        </p>
+                        <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition">
+                            일정 확인
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <p class="text-gray-500 italic" id="resources-cms-note">
+                        ※ Netlify CMS에서 파일 업로드 및 자료 관리가 가능합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CMS Setup Section -->
+    <section id="cms-setup" class="section bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Netlify CMS 설정 가이드</h2>
+            
+            <div class="max-w-6xl mx-auto">
+                <!-- Tab Navigation -->
+                <div class="tab-container">
+                    <button class="tab-btn active" onclick="showTab('files-tab')">
+                        <i class="fas fa-file-code mr-2"></i>필요한 파일들
+                    </button>
+                    <button class="tab-btn" onclick="showTab('setup-tab')">
+                        <i class="fas fa-cog mr-2"></i>설정 방법
+                    </button>
+                    <button class="tab-btn" onclick="showTab('usage-tab')">
+                        <i class="fas fa-user-edit mr-2"></i>사용 방법
+                    </button>
+                </div>
+
+                <!-- Files Tab -->
+                <div id="files-tab" class="tab-content active">
+                    <div class="cms-setup-box">
+                        <h3 class="text-2xl font-bold mb-4">
+                            <i class="fas fa-download mr-2"></i>Netlify CMS 파일 세트
+                        </h3>
+                        <p class="mb-4">
+                            아래 파일들을 GitHub 저장소에 추가하여 완전한 Netlify CMS를 구축하세요.
+                        </p>
+                        <a href="#" class="inline-flex items-center bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                            <i class="fas fa-download mr-2"></i>완전한 CMS 파일 세트 다운로드
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-file-alt mr-2 text-blue-600"></i>admin/index.html
+                            </h4>
+                            <p class="text-gray-600 mb-3">Netlify CMS 관리자 인터페이스</p>
+                            <div class="file-code">
+&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;오산대광교회 CMS&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-cogs mr-2 text-green-600"></i>admin/config.yml
+                            </h4>
+                            <p class="text-gray-600 mb-3">CMS 설정 파일</p>
+                            <div class="file-code">
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "news"
+    label: "교회 소식"
+    folder: "_posts/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "category", widget: "select", 
+         options: ["중요", "행사", "예정", "일반"]}
+      - {label: "내용", name: "body", widget: "markdown"}
+      - {label: "이미지", name: "image", widget: "image", required: false}
+
+  - name: "resources"
+    label: "자료실"
+    folder: "_posts/resources"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "타입", name: "type", widget: "select", 
+         options: ["성경연구", "찬양악보", "교회달력", "기타"]}
+      - {label: "설명", name: "description", widget: "text"}
+      - {label: "내용", name: "body", widget: "markdown"}
+      - {label: "첨부파일", name: "file", widget: "file", required: false}
+
+  - name: "settings"
+    label: "사이트 설정"
+    files:
+      - label: "기본 설정"
+        name: "site"
+        file: "_data/settings.yml"
+        fields:
+          - {label: "교회명", name: "church_name", widget: "string"}
+          - {label: "교회 설명", name: "description", widget: "text"}
+          - {label: "전화번호", name: "phone", widget: "string"}
+          - {label: "이메일", name: "email", widget: "string"}
+          - {label: "주소", name: "address", widget: "text"}
+          - {label: "푸터 메시지", name: "footer_message", widget: "text"}
+          - label: "예배시간"
+            name: "service_times"
+            widget: "list"
+            fields:
+              - {label: "예배명", name: "name", widget: "string"}
+              - {label: "시간", name: "time", widget: "string"}
+          - label: "온라인 헌금"
+            name: "donation"
+            widget: "object"
+            fields:
+              - {label: "은행명", name: "bank", widget: "string"}
+              - {label: "계좌번호", name: "account", widget: "string"}
+              - {label: "예금주", name: "holder", widget: "string"}
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-database mr-2 text-purple-600"></i>_data/settings.yml
+                            </h4>
+                            <p class="text-gray-600 mb-3">기본 사이트 설정</p>
+                            <div class="file-code">
+church_name: "오산대광교회"
+description: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"
+phone: "031-377-0675"
+email: "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="482c2d3a2d237970797f0826293e2d3a662b2725">[email&#160;protected]</a>"
+address: "경기도 오산시 궐리사로46번길 60-5"
+footer_message: "지역을 넘어, 세계로 주님의 사랑을 전합니다"
+
+service_times:
+  - name: "주일예배"
+    time: "일요일 오전 11시"
+  - name: "오후예배"
+    time: "일요일 오후 2시"
+  - name: "새벽기도"
+    time: "일요일 오전 4시"
+
+donation:
+  bank: "농협은행"
+  account: "170354-55-000829"
+  holder: "오산산성교회"
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-folder mr-2 text-orange-600"></i>폴더 구조
+                            </h4>
+                            <p class="text-gray-600 mb-3">필요한 폴더들</p>
+                            <div class="file-code">
+프로젝트/
+├── index.html              (이 파일)
+├── admin/
+│   ├── index.html          (CMS 관리자)
+│   └── config.yml          (CMS 설정)
+├── _data/
+│   └── settings.yml        (사이트 설정)
+├── _posts/
+│   ├── news/              (뉴스 폴더)
+│   └── resources/         (자료 폴더)
+└── assets/
+    └── uploads/           (업로드 폴더)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Tab -->
+                <div id="setup-tab" class="tab-content">
+                    <div class="space-y-6">
+                        <div class="step-card">
+                            <div class="flex items-start">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-2">GitHub 저장소 준비</h4>
+                                    <ul class="text-gray-600 space-y-1">
+                                        <li>• GitHub에서 새 저장소 생성 (예: osandae-church)</li>
+                                        <li>• 위 파일들을 모두 저장소에 업로드</li>
+                                        <li>• 폴더 구조가 정확한지 확인</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="flex items-start">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-2">Netlify 사이트 연결</h4>
+                                    <ul class="text-gray-600 space-y-1">
+                                        <li>• <a href="https://netlify.com" class="text-blue-600 underline">netlify.com</a>에서 회원가입</li>
+                                        <li>• "New site from Git" 선택</li>
+                                        <li>• GitHub 저장소 연결</li>
+                                        <li>• Deploy site 클릭</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="flex items-start">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-2">Netlify Identity 설정</h4>
+                                    <ul class="text-gray-600 space-y-1">
+                                        <li>• Site settings → Identity 메뉴</li>
+                                        <li>• "Enable Identity" 클릭</li>
+                                        <li>• Registration: "Invite only" 선택</li>
+                                        <li>• Services → "Enable Git Gateway" 클릭</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="flex items-start">
+                                <div class="step-number">4</div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-2">관리자 계정 생성</h4>
+                                    <ul class="text-gray-600 space-y-1">
+                                        <li>• Identity → Users → "Invite users"</li>
+                                        <li>• 관리자 이메일 입력 후 초대</li>
+                                        <li>• 이메일 확인하여 비밀번호 설정</li>
+                                        <li>• YOUR_SITE.netlify.app/admin/ 에서 로그인</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Tab -->
+                <div id="usage-tab" class="tab-content">
+                    <div class="space-y-6">
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-4">
+                                <i class="fas fa-newspaper mr-2 text-blue-600"></i>뉴스 관리
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h5 class="font-medium mb-2">뉴스 작성 방법:</h5>
+                                    <ul class="text-gray-600 space-y-1 text-sm">
+                                        <li>1. CMS 관리자 페이지 접속</li>
+                                        <li>2. "교회 소식" 메뉴 클릭</li>
+                                        <li>3. "New 교회 소식" 버튼 클릭</li>
+                                        <li>4. 제목, 내용, 카테고리 입력</li>
+                                        <li>5. 이미지 첨부 (선택사항)</li>
+                                        <li>6. "Publish" → "Save" 클릭</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium mb-2">자동 기능:</h5>
+                                    <ul class="text-gray-600 space-y-1 text-sm">
+                                        <li>• 작성일 자동 기록</li>
+                                        <li>• GitHub 자동 커밋</li>
+                                        <li>• 웹사이트 자동 배포</li>
+                                        <li>• 실시간 미리보기</li>
+                                        <li>• 마크다운 에디터</li>
+                                        <li>• 이미지 자동 최적화</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-4">
+                                <i class="fas fa-folder-open mr-2 text-green-600"></i>자료실 관리
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h5 class="font-medium mb-2">파일 업로드:</h5>
+                                    <ul class="text-gray-600 space-y-1 text-sm">
+                                        <li>• PDF, DOC, MP3 등 지원</li>
+                                        <li>• 드래그&드롭 업로드</li>
+                                        <li>• 자동 파일 관리</li>
+                                        <li>• 다운로드 링크 생성</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium mb-2">자료 분류:</h5>
+                                    <ul class="text-gray-600 space-y-1 text-sm">
+                                        <li>• 성경연구 자료</li>
+                                        <li>• 찬양 악보</li>
+                                        <li>• 교회 달력</li>
+                                        <li>• 기타 자료</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4 class="text-lg font-semibold mb-4">
+                                <i class="fas fa-cog mr-2 text-purple-600"></i>사이트 설정 관리
+                            </h4>
+                            <div class="text-gray-600">
+                                <p class="mb-3">CMS에서 다음 정보들을 쉽게 수정할 수 있습니다:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <h5 class="font-medium mb-2">기본 정보:</h5>
+                                        <ul class="space-y-1 text-sm">
+                                            <li>• 교회명</li>
+                                            <li>• 교회 설명</li>
+                                            <li>• 연락처</li>
+                                            <li>• 주소</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium mb-2">예배 정보:</h5>
+                                        <ul class="space-y-1 text-sm">
+                                            <li>• 주일예배 시간</li>
+                                            <li>• 오후예배 시간</li>
+                                            <li>• 새벽기도 시간</li>
+                                            <li>• 기타 예배</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium mb-2">헌금 정보:</h5>
+                                        <ul class="space-y-1 text-sm">
+                                            <li>• 은행명</li>
+                                            <li>• 계좌번호</li>
+                                            <li>• 예금주</li>
+                                            <li>• 안내 메시지</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start Box -->
+            <div class="mt-8">
+                <div class="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-lg text-center">
+                    <h3 class="text-xl font-bold mb-2">
+                        <i class="fas fa-rocket mr-2"></i>빠른 시작
+                    </h3>
+                    <p class="mb-4">5분 만에 완전한 교회 웹사이트 + CMS 구축하기</p>
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="downloadCMSFiles()" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                            <i class="fas fa-download mr-2"></i>파일 다운로드
+                        </button>
+                        <a href="https://netlify.com" target="_blank" class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition">
+                            <i class="fas fa-external-link-alt mr-2"></i>Netlify 시작하기
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -484,8 +1009,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="mailto:derek1817@naver.com" class="hover:text-white transition">
-                                <i class="fas fa-envelope mr-2"></i>derek1817@naver.com
+                            <a href="/cdn-cgi/l/email-protection#f39796819698c2cbc2c4b39d92859681dd909c9e" class="hover:text-white transition">
+                                <i class="fas fa-envelope mr-2"></i><span class="__cf_email__" data-cfemail="71151403141a40494046311f100714035f121e1c">[email&#160;protected]</span>
                             </a>
                         </li>
                         <li>
@@ -499,6 +1024,9 @@
             
             <div class="border-t border-gray-700 mt-8 pt-8 text-center">
                 <p class="text-gray-400">© 2025 <span id="footer-copyright">오산대광교회 & DGM TV</span>. All rights reserved.</p>
+                <p class="text-gray-500 text-sm mt-2">
+                    <i class="fas fa-cog mr-1"></i>Netlify CMS로 관리되는 웹사이트
+                </p>
             </div>
         </div>
     </footer>
@@ -522,7 +1050,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Global Variables
         const API_KEY = 'AIzaSyByC1DmDF0Em4EsmuwKdYQOyd2Z8RyoIAM';
         const OSANDAE_CHANNEL_ID = 'UCcwM7j_1eMYRkFMrjUPVPRw';
@@ -570,20 +1098,24 @@
                 'main-title-line2': isKorean ? '여기서 시작되어 세계로 뻗어갑니다' : 'Starting here, reaching out to the world',
                 'osandae-channel-btn': isKorean ? '오산대광교회 채널' : 'Osandae Church Channel',
                 'dgmtv-channel-btn': isKorean ? 'DGM TV 채널' : 'DGM TV Channel',
+                'nav-home': isKorean ? '홈' : 'Home',
                 'nav-videos': isKorean ? '영상' : 'Videos',
                 'nav-news': isKorean ? '뉴스' : 'News',
                 'nav-resources': isKorean ? '자료실' : 'Resources',
+                'nav-cms': isKorean ? 'CMS 설정' : 'CMS Setup',
+                'mobile-nav-home': isKorean ? '홈' : 'Home',
                 'mobile-nav-videos': isKorean ? '영상' : 'Videos',
                 'mobile-nav-news': isKorean ? '뉴스' : 'News',
                 'mobile-nav-resources': isKorean ? '자료실' : 'Resources',
+                'mobile-nav-cms': isKorean ? 'CMS 설정' : 'CMS Setup',
                 'video-section-title': isKorean ? '영상 컨텐츠' : 'Video Contents',
-                'news-section-title': isKorean ? '기독교 뉴스' : 'Christian News',
-                'resources-section-title': isKorean ? '자료실' : 'Resources',
+                'news-section-title': isKorean ? '교회 소식' : 'Church News',
+                'resources-section-title': isKorean ? '교회 자료실' : 'Church Resources',
                 'osandae-btn-text': isKorean ? '오산대광교회' : 'Osandae Church',
                 'dgmtv-btn-text': isKorean ? 'DGM TV' : 'DGM TV',
                 'loading-text': isKorean ? '영상을 불러오는 중...' : 'Loading videos...',
-                'news-placeholder': isKorean ? '뉴스 컨텐츠가 준비 중입니다.' : 'News content is being prepared.',
-                'resources-placeholder': isKorean ? '자료실 컨텐츠가 준비 중입니다.' : 'Resource content is being prepared.',
+                'news-cms-note': isKorean ? '※ Netlify CMS 설정 완료 후 관리자 페이지에서 뉴스를 쉽게 작성하고 관리할 수 있습니다.' : '※ After Netlify CMS setup, you can easily create and manage news from the admin page.',
+                'resources-cms-note': isKorean ? '※ Netlify CMS에서 파일 업로드 및 자료 관리가 가능합니다.' : '※ File upload and resource management is available in Netlify CMS.',
                 'footer-church-title': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
                 'footer-message': isKorean ? '지역을 넘어, 세계로 주님의 사랑을 전합니다.' : 'Beyond regions, spreading God\'s love to the world.',
                 'service-times-title': isKorean ? '예배시간' : 'Service Times',
@@ -722,7 +1254,7 @@
                     worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
                     sermon: video => {
                         const title = video.snippet.title.toLowerCase();
-                        return /\[kr\/en\/jp\/cn sub\]/i.test(title);
+                        return title.includes('[kr/en/jp/cn sub]');
                     },
                     podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
                     ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
@@ -732,7 +1264,7 @@
                 dgmtv: {
                     sermon: video => {
                         const title = video.snippet.title.toLowerCase();
-                        return /\[sermon\]/i.test(title);
+                        return title.includes('sermon');
                     },
                     podcast: video => /faithtalk|podcast/i.test(video.snippet.title),
                     quiz: video => /bible trivia|quiz/i.test(video.snippet.title),
@@ -781,6 +1313,31 @@
             window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
         }
 
+        // Tab Navigation
+        function showTab(tabId) {
+            // Hide all tab contents
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all tab buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Activate clicked button
+            event.target.classList.add('active');
+        }
+
+        // Download CMS Files
+        function downloadCMSFiles() {
+            alert(isKorean ? 
+                'CMS 파일들을 생성합니다!\n\n1. admin/index.html\n2. admin/config.yml\n3. _data/settings.yml\n4. 필요한 폴더 구조\n\n이 파일들을 GitHub 저장소에 업로드하세요.' :
+                'Generating CMS files!\n\n1. admin/index.html\n2. admin/config.yml\n3. _data/settings.yml\n4. Required folder structure\n\nUpload these files to your GitHub repository.'
+            );
+        }
+
         // Donation Modal
         function showDonationModal() {
             document.getElementById('donationModal').classList.add('show');
@@ -805,12 +1362,24 @@
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
                 });
             });
         });
     </script>
 </body>
 </html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDrul%2Fun69wd5ZVaNUGAorOJdcXgcCLM8GYysZqxUHXJk8WAJbg7Ew7UMW9E%2B5eEBf4%2FqszmOlXdc1JhqILKBRrbMuACsvWWzH6Gn7A7jWRhqJX1PyMMHkR7r3lOWonM%2BpnAE6STNR4t6rOckcD6GjCcNRBKQkIw82QSvFO7bvQwRJJlO06rP%2Fo4FicLy89O6pLwTD61HhbvRqGs534DVni4c0VpTW8C8%2B%2FSjzW1hTVgwAOUVHmmcmjpjJjwZpCKjVLPA34wIcZySg39idrV2QtFXzRBKlnZqQdUBVsnTREV3AzguMdMyroG6o%2FLcKJKMyPlubAUNbbYrZFc7hWirSFSoVFTgsTYesEJNMrtJ3jSrHWMJMCf9E5vGGT62or4C%2BChaGltyyays1dM3TmL%2FD%2FOWOVzkMl7rovQ7L4i%2FAI2q2OGgPhp3pcFemqEVeUfKgn0dXhcRryZ8IoPTZyxjPCmlsvsTkSk0fZPw1%2FkERr9ixlIiF%2Bj9Ltbek%2FMOeooVm%2FeX9mgnF145pueaCmY3lQU%3D";
+        window.__genspark_locale = "ko-KR";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDrul/un69wd5ZVaNUGAorOJdcXgcCLM8GYysZqxUHXJk8WAJbg7Ew7UMW9E+5eEBf4/qszmOlXdc1JhqILKBRrbMuACsvWWzH6Gn7A7jWRhqJX1PyMMHkR7r3lOWonM+pnAE6STNR4t6rOckcD6GjCcNRBKQkIw82QSvFO7bvQwRJJlO06rP/o4FicLy89O6pLwTD61HhbvRqGs534DVni4c0VpTW8C8+/SjzW1hTVgwAOUVHmmcmjpjJjwZpCKjVLPA34wIcZySg39idrV2QtFXzRBKlnZqQdUBVsnTREV3AzguMdMyroG6o/LcKJKMyPlubAUNbbYrZFc7hWirSFSoVFTgsTYesEJNMrtJ3jSrHWMJMCf9E5vGGT62or4C+ChaGltyyays1dM3TmL/D/OWOVzkMl7rovQ7L4i/AI2q2OGgPhp3pcFemqEVeUfKgn0dXhcRryZ8IoPTZyxjPCmlsvsTkSk0fZPw1/kERr9ixlIiF+j9Ltbek/MOeooVm/eX9mgnF145pueaCmY3lQU=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
