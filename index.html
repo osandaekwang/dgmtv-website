@@ -740,12 +740,9 @@
                 osandae: {
                     worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
                     sermon: video => {
-                        const title = video.snippet.title.toLowerCase();
-                        return title.includes('[kr/en/jp/cn sub]') || 
-                               (title.includes('설교') && !title.includes('퀴즈') && 
-                                !title.includes('우쿨') && !title.includes('팟캐스트') &&
-                                !title.includes('묵상') && !title.includes('예배'));
-                    },
+    const title = video.snippet.title.toLowerCase();
+    return title.includes('[kr/en/jp/cn sub]');
+},
                     podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
                     ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
                     quiz: video => /퀴즈|quiz/i.test(video.snippet.title),
