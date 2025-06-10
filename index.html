@@ -719,7 +719,7 @@
         function filterVideosByCategory(videos, channel, categoryKey) {
             const filters = {
                 osandae: {
-                    worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
+                    worship: video => /KR/EN/JP/CN Sub/i.test(video.snippet.title),
                     sermon: video => {
                         const title = video.snippet.title.toLowerCase();
                         return title.includes('[kr/en/jp/cn sub]') || 
