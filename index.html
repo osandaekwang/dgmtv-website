@@ -750,12 +750,9 @@
                 },
                 dgmtv: {
                     sermon: video => {
-                        const title = video.snippet.title.toLowerCase();
-                        return title.includes('sermon') && 
-                               !title.includes('quiz') && !title.includes('trivia') &&
-                               !title.includes('podcast') && !title.includes('faithtalk') &&
-                               !title.includes('prayer');
-                    },
+    const title = video.snippet.title.toLowerCase();
+    return title.includes('[sermon]');
+},
                     podcast: video => /faithtalk|podcast/i.test(video.snippet.title),
                     quiz: video => /bible trivia|quiz/i.test(video.snippet.title),
                     meditation: video => /today.*one.*verse.*one.*prayer|prayer/i.test(video.snippet.title)
