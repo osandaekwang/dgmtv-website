@@ -1,6 +1,5 @@
 backend:
   name: git-gateway
-  repo: osandaekwang/dgmtv-website
   branch: main
 
 media_folder: "assets/uploads"
@@ -8,7 +7,7 @@ public_folder: "/assets/uploads"
 
 collections:
   - name: "news"
-    label: "뉴스"
+    label: "뉴스 관리"
     folder: "_posts/news"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
@@ -16,26 +15,40 @@ collections:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "발행일", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "category", widget: "select", options: ["중요", "행사", "예정", "일반"]}
+      - {label: "요약", name: "excerpt", widget: "text", required: false}
       - {label: "내용", name: "body", widget: "markdown"}
-      - {label: "이미지", name: "image", widget: "image", required: false}
+      - {label: "대표 이미지", name: "image", widget: "image", required: false}
+      - {label: "작성자", name: "author", widget: "string", default: "관리자"}
 
   - name: "resources"
-    label: "자료"
+    label: "자료 관리"
     folder: "_posts/resources"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "발행일", name: "date", widget: "datetime"}
-      - {label: "타입", name: "type", widget: "select", options: ["기독교 기사", "신학 논문", "다운로드 자료"]}
+      - {label: "자료 유형", name: "type", widget: "select", options: ["기독교 기사", "신학 논문", "설교 자료", "기타 자료"]}
       - {label: "설명", name: "description", widget: "text"}
       - {label: "내용", name: "body", widget: "markdown"}
       - {label: "첨부파일", name: "file", widget: "file", required: false}
+      - {label: "다운로드 링크", name: "download_url", widget: "string", required: false}
+
+  - name: "pages"
+    label: "페이지 관리"
+    files:
+      - label: "교회 소개"
+        name: "about"
+        file: "_pages/about.md"
+        fields:
+          - {label: "제목", name: "title", widget: "string"}
+          - {label: "내용", name: "body", widget: "markdown"}
+          - {label: "이미지", name: "image", widget: "image", required: false}
 
   - name: "settings"
-    label: "설정"
+    label: "사이트 설정"
     files:
-      - label: "사이트 설정"
+      - label: "기본 설정"
         name: "site"
         file: "_data/settings.yml"
         fields:
@@ -44,4 +57,25 @@ collections:
           - {label: "교회 전화번호", name: "phone", widget: "string"}
           - {label: "교회 이메일", name: "email", widget: "string"}
           - {label: "교회 주소", name: "address", widget: "text"}
-          - {label: "푸터 메시지", name: "footer_text", widget: "text", default: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"}
+          - {label: "푸터 메시지", name: "footer_text", widget: "text"}
+          - label: "소셜 미디어"
+            name: "social"
+            widget: "object"
+            fields:
+              - {label: "YouTube 오산대광교회", name: "youtube_osandae", widget: "string", required: false}
+              - {label: "YouTube DGM TV", name: "youtube_dgmtv", widget: "string", required: false}
+              - {label: "Facebook", name: "facebook", widget: "string", required: false}
+          - label: "예배 시간"
+            name: "service_times"
+            widget: "object"
+            fields:
+              - {label: "주일예배", name: "sunday", widget: "string"}
+              - {label: "오후예배", name: "afternoon", widget: "string"}
+              - {label: "새벽기도", name: "dawn", widget: "string"}
+          - label: "온라인 헌금"
+            name: "donation"
+            widget: "object"
+            fields:
+              - {label: "은행명", name: "bank", widget: "string"}
+              - {label: "계좌번호", name: "account", widget: "string"}
+              - {label: "예금주", name: "holder", widget: "string"}
