@@ -831,29 +831,95 @@
     try {
         console.log('뉴스 로드 시작...');
         const response = await fetch('https://api.github.com/repos/osandaekwang/dgmtv-website/contents/_posts/news');
-        console.log('API 응답:', response.status);
+        console.log('뉴스 API 응답:', response.status);
         
         if (response.ok) {
             const files = await response.json();
-            console.log('파일 목록:', files);
+            console.log('뉴스 파일들:', files);
             const newsContainer = document.getElementById('news-container');
             
             if (files.length > 0) {
-                console.log('뉴스 파일 개수:', files.length);
-                // 기존 코드 그대로...
+                let newsHtml = '';
+                for (let i = 0; i < Math.min(files.length, 6); i++) {
+                    const file = files[i];
+                    if (file.name.endsWith('.md') && file.name !== 'README.md') {
+                        console.log('뉴스 파일 처리 중:', file.name);
+                        const contentResponse = await fetch(file.download_url);
+                        const content = await contentResponse.text();
+                        console.log('뉴스 파일 내용:', content.substring(0, 200));
+                        
+                        const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+                        if (frontMatterMatch) {
+                            const frontMatter = frontMatterMatch[1];
+                            const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n/, '');
+                            
+                            const title = frontMatter.match(/title:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/title:\s*([^\n]+)/)?.[1] || '제목 없음';
+                            const date = frontMatter.match(/date:\s*(.+)/)?.[1] || '';
+                            const category = frontMatter.match(/category:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/category:\s*([^\n]+)/)?.[1] || '일반';
+                            const excerpt = frontMatter.match(/excerpt:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/excerpt:\s*([^\n]+)/)?.[1] || '';
+                            const image = frontMatter.match(/image:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/image:\s*([^\n]+)/)?.[1] || '';
+                            const author = frontMatter.match(/author:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/author:\s*([^\n]+)/)?.[1] || '관리자';
+                            
+                            console.log('파싱된 뉴스 데이터:', { title, date, category, excerpt, author });
+                            
+                            const categoryColors = {
+                                '중요': 'bg-red-500',
+                                '행사': 'bg-blue-500', 
+                                '예정': 'bg-yellow-500',
+                                '일반': 'bg-gray-500'
+                            };
+                            const categoryColor = categoryColors[category] || 'bg-gray-500';
+                            
+                            newsHtml += `
+                                <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:transform hover:scale-105 transition cursor-pointer" 
+                                         onclick="showNewsModal('${title.replace(/'/g, "\\'")}', '${date}', '${category}', '${author}', '${excerpt.replace(/'/g, "\\'")}', \`${bodyContent.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${image}')">
+                                    ${image ? `<img src="${image}" alt="${title}" class="w-full h-48 object-cover">` : ''}
+                                    <div class="p-6">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-xs text-white ${categoryColor} px-2 py-1 rounded">
+                                                ${category}
+                                            </span>
+                                            <span class="text-sm text-gray-500">
+                                                ${new Date(date).toLocaleDateString('ko-KR')}
+                                            </span>
+                                        </div>
+                                        <h4 class="text-xl font-semibold text-gray-800 mb-3">${title}</h4>
+                                        ${excerpt ? `<p class="text-gray-600">${excerpt}</p>` : ''}
+                                        <div class="mt-3 text-sm text-gray-500">
+                                            <span>작성자: ${author}</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            `;
+                        }
+                    }
+                }
+                if (newsHtml) {
+                    newsContainer.innerHTML = newsHtml;
+                } else {
+                    newsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">아직 뉴스가 없습니다.</p>
+                            <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                                CMS 관리자로 이동
+                            </a>
+                        </div>
+                    `;
+                }
             } else {
-                console.log('뉴스 파일이 없습니다.');
                 newsContainer.innerHTML = `
                     <div class="col-span-full text-center py-12">
-                        <p class="text-gray-500">아직 작성된 뉴스가 없습니다.</p>
-                        <button onclick="testNewsModal()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition mt-4">
-                            뉴스 모달 테스트
-                        </button>
+                        <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">뉴스 파일이 없습니다.</p>
+                        <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                            CMS 관리자로 이동
+                        </a>
                     </div>
                 `;
             }
         } else {
-            console.log('API 요청 실패:', response.status);
+            console.log('뉴스 API 요청 실패:', response.status);
         }
     } catch (error) {
         console.log('뉴스 로드 중 오류:', error);
@@ -862,32 +928,41 @@
 
 
 
+
         async function loadResourcesContent() {
     try {
+        console.log('자료 로드 시작...');
         const response = await fetch('https://api.github.com/repos/osandaekwang/dgmtv-website/contents/_posts/resources');
+        console.log('자료 API 응답:', response.status);
+        
         if (response.ok) {
             const files = await response.json();
+            console.log('자료 파일들:', files);
             const resourcesContainer = document.getElementById('resources-container');
             
             if (files.length > 0) {
                 let resourcesHtml = '';
                 for (let i = 0; i < Math.min(files.length, 6); i++) {
                     const file = files[i];
-                    if (file.name.endsWith('.md')) {
+                    if (file.name.endsWith('.md') && file.name !== 'README.md') {
+                        console.log('자료 파일 처리 중:', file.name);
                         const contentResponse = await fetch(file.download_url);
                         const content = await contentResponse.text();
+                        console.log('자료 파일 내용:', content.substring(0, 200));
                         
                         const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
                         if (frontMatterMatch) {
                             const frontMatter = frontMatterMatch[1];
                             const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n/, '');
                             
-                            const title = frontMatter.match(/title:\s*"([^"]+)"/)?.[1] || '제목 없음';
+                            const title = frontMatter.match(/title:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/title:\s*([^\n]+)/)?.[1] || '제목 없음';
                             const date = frontMatter.match(/date:\s*(.+)/)?.[1] || '';
-                            const type = frontMatter.match(/type:\s*"([^"]+)"/)?.[1] || '자료';
-                            const description = frontMatter.match(/description:\s*"([^"]+)"/)?.[1] || '';
-                            const downloadFile = frontMatter.match(/file:\s*"([^"]+)"/)?.[1] || '';
-                            const downloadUrl = frontMatter.match(/download_url:\s*"([^"]+)"/)?.[1] || '';
+                            const type = frontMatter.match(/type:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/type:\s*([^\n]+)/)?.[1] || '자료';
+                            const description = frontMatter.match(/description:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/description:\s*([^\n]+)/)?.[1] || '';
+                            const downloadFile = frontMatter.match(/file:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/file:\s*([^\n]+)/)?.[1] || '';
+                            const downloadUrl = frontMatter.match(/download_url:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/download_url:\s*([^\n]+)/)?.[1] || '';
+                            
+                            console.log('파싱된 자료 데이터:', { title, date, type, description });
                             
                             const typeColors = {
                                 '기독교 기사': 'bg-blue-500',
@@ -920,13 +995,38 @@
                         }
                     }
                 }
-                resourcesContainer.innerHTML = resourcesHtml;
+                if (resourcesHtml) {
+                    resourcesContainer.innerHTML = resourcesHtml;
+                } else {
+                    resourcesContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">아직 자료가 없습니다.</p>
+                            <a href="/admin/" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                CMS 관리자로 이동
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                resourcesContainer.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">자료 파일이 없습니다.</p>
+                        <a href="/admin/" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                            CMS 관리자로 이동
+                        </a>
+                    </div>
+                `;
             }
+        } else {
+            console.log('자료 API 요청 실패:', response.status);
         }
     } catch (error) {
         console.log('자료 로드 중 오류:', error);
     }
 }
+
 
 
         // Initialize
