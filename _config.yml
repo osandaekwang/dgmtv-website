@@ -1,0 +1,54 @@
+# Site settings
+title: "오산대광교회 & DGM TV"
+description: "지역을 넘어, 세계로 주님의 사랑을 전합니다."
+url: "https://your-username.github.io"
+baseurl: "/dgmtv-website"
+
+# Jekyll settings
+markdown: kramdown
+highlighter: rouge
+permalink: /:categories/:year/:month/:day/:title/
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: "_posts/news"
+    values:
+      layout: "post"
+      categories: ["news"]
+  - scope:
+      path: "_posts/resources"
+    values:
+      layout: "post"
+      categories: ["resources"]
+
+# Plugins (GitHub Pages compatible)
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - admin/
+  - README.md
+  - .gitignore
+
+# Include
+include:
+  - _pages
+
+# Timezone
+timezone: Asia/Seoul
+
+# Language
+lang: ko
+
+# GitHub Pages
+github: [metadata]
