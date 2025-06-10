@@ -1,24 +1,24 @@
+---
+layout: default
+title: 오산대광교회 & DGM TV
+---
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오산대광교회 & DGM TV - Netlify CMS</title>
+    <title>{{ site.data.settings.title | default: "오산대광교회 & DGM TV" }}</title>
+    <meta name="description" content="{{ site.data.settings.description | default: "지역을 넘어, 세계로 주님의 사랑을 전합니다." }}">
+    
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 50vh;
@@ -27,287 +27,19 @@
             justify-content: center;
             padding: 40px 0;
         }
-
+        
         @media (max-width: 768px) {
             .hero-section {
                 min-height: 45vh;
                 padding: 30px 0;
             }
         }
-
-        .category-emoji {
-            filter: grayscale(100%);
-            color: #374151;
-        }
-
-        .language-toggle {
-            background: #6366f1;
-            border-radius: 20px;
-            padding: 4px;
-            display: flex;
-            position: relative;
-            width: 80px;
-            height: 32px;
-        }
-
-        .language-option {
-            flex: 1;
-            text-align: center;
-            padding: 4px 8px;
-            border-radius: 16px;
-            color: white;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .language-option.active {
-            background: white;
-            color: #6366f1;
-        }
-
-        .mobile-language-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: #6366f1;
-            border-radius: 25px;
-            padding: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
-            cursor: pointer;
-        }
-
-        .mobile-language-float .language-toggle {
-            background: transparent;
-            padding: 0;
-            width: 60px;
-            height: 24px;
-        }
-
-        .mobile-language-float .language-option {
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 12px;
-        }
-
-        @media (max-width: 768px) {
-            .desktop-language { 
-                display: none !important; 
-            }
-            .mobile-language-float { 
-                display: flex !important; 
-            }
-            .mobile-nav {
-                display: flex;
-                justify-content: center;
-                margin: 10px 0;
-                padding: 0 20px;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
-            .mobile-nav a {
-                white-space: nowrap;
-                padding: 8px 16px;
-                font-size: 14px;
-                background: #f3f4f6;
-                border-radius: 8px;
-                text-decoration: none;
-                color: #374151;
-                font-weight: 500;
-            }
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            justify-content: center;
-            margin: 20px 0;
-            padding: 0 20px;
-        }
-
-        .category-btn {
-            padding: 12px 16px;
-            background: #f3f4f6;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-align: center;
-            min-height: 48px;
-        }
-
-        .category-btn:hover {
-            background: #e5e7eb;
-            transform: translateY(-1px);
-        }
-
-        .category-btn.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .channel-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 8px;
-        }
-
-        .channel-btn.active {
-            background: #ef4444;
-            color: white;
-        }
-
-        .channel-btn.inactive {
-            background: #e5e7eb;
-            color: #6b7280;
-        }
-
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-            padding: 0 20px;
-        }
-
-        .video-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .video-card:hover {
+        
+        .news-item:hover {
             transform: translateY(-2px);
+            transition: transform 0.3s ease;
         }
-
-        .video-thumbnail {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-
-        .video-info {
-            padding: 16px;
-        }
-
-        .video-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .video-meta {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .main-title-line1 {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 8px;
-        }
-
-        .main-title-line2 {
-            font-size: 1.5rem;
-            font-weight: 400;
-            line-height: 1.3;
-            opacity: 0.9;
-        }
-
-        @media (max-width: 768px) {
-            .main-title-line1 {
-                font-size: 2rem;
-            }
-            .main-title-line2 {
-                font-size: 1.1rem;
-            }
-            .category-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 0 16px;
-            }
-            .category-btn {
-                padding: 10px 12px;
-                font-size: 13px;
-                min-height: 44px;
-            }
-        }
-
-        .donation-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .donation-modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f6;
-            border-radius: 50%;
-            border-top-color: #3b82f6;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .section {
-            padding: 40px 0;
-        }
-
-        @media (max-width: 768px) {
-            .section {
-                padding: 20px 0;
-            }
-        }
-
+        
         .donation-btn {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
@@ -321,1065 +53,377 @@
             gap: 6px;
             box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
         }
-
+        
         .donation-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
             color: white;
             text-decoration: none;
         }
-
-        .cms-setup-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-
-        .file-code {
-            background: #1f2937;
-            color: #e5e7eb;
-            padding: 1rem;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-
-        .step-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin: 1rem 0;
-        }
-
-        .step-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            font-weight: 600;
-            margin-right: 1rem;
-        }
-
-        .news-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin: 1rem 0;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .news-date {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .news-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        .news-content {
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .tab-container {
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 2rem;
-        }
-
-        .tab-btn {
-            padding: 1rem 2rem;
-            border: none;
-            background: none;
-            color: #6b7280;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            color: #3b82f6;
-            border-bottom-color: #3b82f6;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
     </style>
 </head>
-<body>
-    <!-- Header -->
+<body class="bg-gray-50">
+
+    <!-- 헤더 -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <i class="fas fa-church text-2xl text-indigo-600"></i>
-                    <h1 class="text-2xl font-bold text-gray-800" id="site-title">오산대광교회 & DGM TV</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">
+                        {{ site.data.settings.title | default: "오산대광교회 & DGM TV" }}
+                    </h1>
                 </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <nav class="flex space-x-6">
-                        <a href="#home" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-home">홈</a>
-                        <a href="#videos" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-videos">영상</a>
-                        <a href="#news" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-news">뉴스</a>
-                        <a href="#resources" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-resources">자료실</a>
-                        <a href="#cms-setup" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-cms">CMS 설정</a>
-                    </nav>
-                    
-                    <!-- Desktop Language Toggle -->
-                    <div class="language-toggle desktop-language" onclick="toggleLanguage()">
-                        <div class="language-option active" id="ko-option">KO</div>
-                        <div class="language-option" id="en-option">EN</div>
-                    </div>
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-6">
+                        <li><a href="#home" class="text-gray-600 hover:text-indigo-600 font-medium">홈</a></li>
+                        <li><a href="#news" class="text-gray-600 hover:text-indigo-600 font-medium">뉴스</a></li>
+                        <li><a href="#resources" class="text-gray-600 hover:text-indigo-600 font-medium">자료</a></li>
+                        <li><a href="#contact" class="text-gray-600 hover:text-indigo-600 font-medium">연락처</a></li>
+                    </ul>
+                </nav>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </div>
-            
-            <!-- Mobile Navigation -->
-            <div class="md:hidden mobile-nav">
-                <a href="#home" id="mobile-nav-home">홈</a>
-                <a href="#videos" id="mobile-nav-videos">영상</a>
-                <a href="#news" id="mobile-nav-news">뉴스</a>
-                <a href="#resources" id="mobile-nav-resources">자료실</a>
-                <a href="#cms-setup" id="mobile-nav-cms">CMS 설정</a>
+            <!-- 모바일 메뉴 -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
+                <ul class="flex flex-col space-y-2">
+                    <li><a href="#home" class="block py-2 text-gray-600 hover:text-indigo-600">홈</a></li>
+                    <li><a href="#news" class="block py-2 text-gray-600 hover:text-indigo-600">뉴스</a></li>
+                    <li><a href="#resources" class="block py-2 text-gray-600 hover:text-indigo-600">자료</a></li>
+                    <li><a href="#contact" class="block py-2 text-gray-600 hover:text-indigo-600">연락처</a></li>
+                </ul>
             </div>
         </div>
     </header>
 
-    <!-- Mobile Floating Language Button -->
-    <div class="mobile-language-float" onclick="toggleLanguage()">
-        <div class="language-toggle">
-            <div class="language-option active" id="mobile-ko-option">KO</div>
-            <div class="language-option" id="mobile-en-option">EN</div>
-        </div>
-    </div>
-
-    <!-- Hero Section -->
+    <!-- 메인 배너 -->
     <section id="home" class="hero-section text-white">
         <div class="container mx-auto px-4 text-center">
             <div>
-                <div class="main-title-line1" id="main-title-line1">진리의 말씀, 사랑의 나눔</div>
-                <div class="main-title-line2" id="main-title-line2">여기서 시작되어 세계로 뻗어갑니다</div>
-                
-                <div class="flex justify-center space-x-4 mt-8">
-                    <a href="https://www.youtube.com/channel/UCcwM7j_1eMYRkFMrjUPVPRw" target="_blank" 
-                       class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                        <i class="fas fa-church mr-2"></i><span id="osandae-channel-btn">오산대광교회 채널</span>
-                    </a>
-                    <a href="https://www.youtube.com/channel/UCARlnnL9L0Y6ZTxeVAV6j0g" target="_blank"
-                       class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition">
-                        <i class="fas fa-video mr-2"></i><span id="dgmtv-channel-btn">DGM TV 채널</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Video Content Section -->
-    <section id="videos" class="section bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="video-section-title">영상 컨텐츠</h2>
-            
-            <!-- Channel Selection -->
-            <div class="text-center mb-6">
-                <button class="channel-btn active" id="osandae-btn" onclick="selectChannel('osandae')">
-                    <i class="fas fa-church mr-2"></i><span id="osandae-btn-text">오산대광교회</span>
-                </button>
-                <button class="channel-btn inactive" id="dgmtv-btn" onclick="selectChannel('dgmtv')">
-                    <i class="fas fa-video mr-2"></i><span id="dgmtv-btn-text">DGM TV</span>
-                </button>
-            </div>
-
-            <!-- Category Buttons -->
-            <div class="category-grid" id="category-container">
-                <!-- Categories will be populated by JavaScript -->
-            </div>
-
-            <!-- Loading Indicator -->
-            <div id="loading-indicator" class="text-center py-8">
-                <div class="loading-spinner"></div>
-                <p class="mt-2 text-gray-600" id="loading-text">영상을 불러오는 중...</p>
-            </div>
-
-            <!-- Video Grid -->
-            <div class="video-grid" id="video-container">
-                <!-- Videos will be populated by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- News Section -->
-    <section id="news" class="section bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="news-section-title">교회 소식</h2>
-            
-            <!-- Sample News Items -->
-            <div class="max-w-4xl mx-auto">
-                <div class="news-card">
-                    <div class="news-date">2025년 1월 12일</div>
-                    <div class="news-title">웹사이트 오픈 안내</div>
-                    <div class="news-content">
-                        오산대광교회 공식 웹사이트가 새롭게 오픈되었습니다. 앞으로 더욱 편리하게 교회 소식과 예배 정보를 확인하실 수 있습니다.
-                    </div>
-                </div>
-                
-                <div class="news-card">
-                    <div class="news-date">2025년 1월 10일</div>
-                    <div class="news-title">주일 예배 시간 안내</div>
-                    <div class="news-content">
-                        주일예배는 오전 11시, 오후예배는 오후 2시에 진행됩니다. 새벽기도회는 일요일 오전 4시에 있습니다.
-                    </div>
-                </div>
-                
-                <div class="text-center mt-8">
-                    <p class="text-gray-500 italic" id="news-cms-note">
-                        ※ Netlify CMS 설정 완료 후 관리자 페이지에서 뉴스를 쉽게 작성하고 관리할 수 있습니다.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Resources Section -->
-    <section id="resources" class="section bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="resources-section-title">교회 자료실</h2>
-            
-            <div class="max-w-4xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-bible text-4xl text-indigo-600 mb-2"></i>
-                            <h3 class="text-lg font-semibold text-gray-800">성경 연구 자료</h3>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">
-                            매주 업데이트되는 성경 연구 자료와 설교 원고를 다운로드하실 수 있습니다.
-                        </p>
-                        <button class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
-                            자료 다운로드
-                        </button>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-music text-4xl text-green-600 mb-2"></i>
-                            <h3 class="text-lg font-semibold text-gray-800">찬양 악보</h3>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">
-                            주일 예배와 특별 행사에서 사용되는 찬양 악보를 제공합니다.
-                        </p>
-                        <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition">
-                            악보 다운로드
-                        </button>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-calendar text-4xl text-purple-600 mb-2"></i>
-                            <h3 class="text-lg font-semibold text-gray-800">교회 달력</h3>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">
-                            교회 행사 일정과 예배 시간표를 확인하실 수 있습니다.
-                        </p>
-                        <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition">
-                            일정 확인
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="text-center mt-8">
-                    <p class="text-gray-500 italic" id="resources-cms-note">
-                        ※ Netlify CMS에서 파일 업로드 및 자료 관리가 가능합니다.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CMS Setup Section -->
-    <section id="cms-setup" class="section bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Netlify CMS 설정 가이드</h2>
-            
-            <div class="max-w-6xl mx-auto">
-                <!-- Tab Navigation -->
-                <div class="tab-container">
-                    <button class="tab-btn active" onclick="showTab('files-tab')">
-                        <i class="fas fa-file-code mr-2"></i>필요한 파일들
-                    </button>
-                    <button class="tab-btn" onclick="showTab('setup-tab')">
-                        <i class="fas fa-cog mr-2"></i>설정 방법
-                    </button>
-                    <button class="tab-btn" onclick="showTab('usage-tab')">
-                        <i class="fas fa-user-edit mr-2"></i>사용 방법
-                    </button>
-                </div>
-
-                <!-- Files Tab -->
-                <div id="files-tab" class="tab-content active">
-                    <div class="cms-setup-box">
-                        <h3 class="text-2xl font-bold mb-4">
-                            <i class="fas fa-download mr-2"></i>Netlify CMS 파일 세트
-                        </h3>
-                        <p class="mb-4">
-                            아래 파일들을 GitHub 저장소에 추가하여 완전한 Netlify CMS를 구축하세요.
-                        </p>
-                        <a href="#" class="inline-flex items-center bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                            <i class="fas fa-download mr-2"></i>완전한 CMS 파일 세트 다운로드
-                        </a>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-3">
-                                <i class="fas fa-file-alt mr-2 text-blue-600"></i>admin/index.html
-                            </h4>
-                            <p class="text-gray-600 mb-3">Netlify CMS 관리자 인터페이스</p>
-                            <div class="file-code">
-&lt;!doctype html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;meta charset="utf-8" /&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
-  &lt;title&gt;오산대광교회 CMS&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-3">
-                                <i class="fas fa-cogs mr-2 text-green-600"></i>admin/config.yml
-                            </h4>
-                            <p class="text-gray-600 mb-3">CMS 설정 파일</p>
-                            <div class="file-code">
-backend:
-  name: git-gateway
-  branch: main
-
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
-
-collections:
-  - name: "news"
-    label: "교회 소식"
-    folder: "_posts/news"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    fields:
-      - {label: "제목", name: "title", widget: "string"}
-      - {label: "날짜", name: "date", widget: "datetime"}
-      - {label: "카테고리", name: "category", widget: "select", 
-         options: ["중요", "행사", "예정", "일반"]}
-      - {label: "내용", name: "body", widget: "markdown"}
-      - {label: "이미지", name: "image", widget: "image", required: false}
-
-  - name: "resources"
-    label: "자료실"
-    folder: "_posts/resources"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    fields:
-      - {label: "제목", name: "title", widget: "string"}
-      - {label: "날짜", name: "date", widget: "datetime"}
-      - {label: "타입", name: "type", widget: "select", 
-         options: ["성경연구", "찬양악보", "교회달력", "기타"]}
-      - {label: "설명", name: "description", widget: "text"}
-      - {label: "내용", name: "body", widget: "markdown"}
-      - {label: "첨부파일", name: "file", widget: "file", required: false}
-
-  - name: "settings"
-    label: "사이트 설정"
-    files:
-      - label: "기본 설정"
-        name: "site"
-        file: "_data/settings.yml"
-        fields:
-          - {label: "교회명", name: "church_name", widget: "string"}
-          - {label: "교회 설명", name: "description", widget: "text"}
-          - {label: "전화번호", name: "phone", widget: "string"}
-          - {label: "이메일", name: "email", widget: "string"}
-          - {label: "주소", name: "address", widget: "text"}
-          - {label: "푸터 메시지", name: "footer_message", widget: "text"}
-          - label: "예배시간"
-            name: "service_times"
-            widget: "list"
-            fields:
-              - {label: "예배명", name: "name", widget: "string"}
-              - {label: "시간", name: "time", widget: "string"}
-          - label: "온라인 헌금"
-            name: "donation"
-            widget: "object"
-            fields:
-              - {label: "은행명", name: "bank", widget: "string"}
-              - {label: "계좌번호", name: "account", widget: "string"}
-              - {label: "예금주", name: "holder", widget: "string"}
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-3">
-                                <i class="fas fa-database mr-2 text-purple-600"></i>_data/settings.yml
-                            </h4>
-                            <p class="text-gray-600 mb-3">기본 사이트 설정</p>
-                            <div class="file-code">
-church_name: "오산대광교회"
-description: "하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회"
-phone: "031-377-0675"
-email: "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="482c2d3a2d237970797f0826293e2d3a662b2725">[email&#160;protected]</a>"
-address: "경기도 오산시 궐리사로46번길 60-5"
-footer_message: "지역을 넘어, 세계로 주님의 사랑을 전합니다"
-
-service_times:
-  - name: "주일예배"
-    time: "일요일 오전 11시"
-  - name: "오후예배"
-    time: "일요일 오후 2시"
-  - name: "새벽기도"
-    time: "일요일 오전 4시"
-
-donation:
-  bank: "농협은행"
-  account: "170354-55-000829"
-  holder: "오산산성교회"
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-3">
-                                <i class="fas fa-folder mr-2 text-orange-600"></i>폴더 구조
-                            </h4>
-                            <p class="text-gray-600 mb-3">필요한 폴더들</p>
-                            <div class="file-code">
-프로젝트/
-├── index.html              (이 파일)
-├── admin/
-│   ├── index.html          (CMS 관리자)
-│   └── config.yml          (CMS 설정)
-├── _data/
-│   └── settings.yml        (사이트 설정)
-├── _posts/
-│   ├── news/              (뉴스 폴더)
-│   └── resources/         (자료 폴더)
-└── assets/
-    └── uploads/           (업로드 폴더)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Setup Tab -->
-                <div id="setup-tab" class="tab-content">
-                    <div class="space-y-6">
-                        <div class="step-card">
-                            <div class="flex items-start">
-                                <div class="step-number">1</div>
-                                <div>
-                                    <h4 class="text-lg font-semibold mb-2">GitHub 저장소 준비</h4>
-                                    <ul class="text-gray-600 space-y-1">
-                                        <li>• GitHub에서 새 저장소 생성 (예: osandae-church)</li>
-                                        <li>• 위 파일들을 모두 저장소에 업로드</li>
-                                        <li>• 폴더 구조가 정확한지 확인</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="flex items-start">
-                                <div class="step-number">2</div>
-                                <div>
-                                    <h4 class="text-lg font-semibold mb-2">Netlify 사이트 연결</h4>
-                                    <ul class="text-gray-600 space-y-1">
-                                        <li>• <a href="https://netlify.com" class="text-blue-600 underline">netlify.com</a>에서 회원가입</li>
-                                        <li>• "New site from Git" 선택</li>
-                                        <li>• GitHub 저장소 연결</li>
-                                        <li>• Deploy site 클릭</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="flex items-start">
-                                <div class="step-number">3</div>
-                                <div>
-                                    <h4 class="text-lg font-semibold mb-2">Netlify Identity 설정</h4>
-                                    <ul class="text-gray-600 space-y-1">
-                                        <li>• Site settings → Identity 메뉴</li>
-                                        <li>• "Enable Identity" 클릭</li>
-                                        <li>• Registration: "Invite only" 선택</li>
-                                        <li>• Services → "Enable Git Gateway" 클릭</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="flex items-start">
-                                <div class="step-number">4</div>
-                                <div>
-                                    <h4 class="text-lg font-semibold mb-2">관리자 계정 생성</h4>
-                                    <ul class="text-gray-600 space-y-1">
-                                        <li>• Identity → Users → "Invite users"</li>
-                                        <li>• 관리자 이메일 입력 후 초대</li>
-                                        <li>• 이메일 확인하여 비밀번호 설정</li>
-                                        <li>• YOUR_SITE.netlify.app/admin/ 에서 로그인</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Usage Tab -->
-                <div id="usage-tab" class="tab-content">
-                    <div class="space-y-6">
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-4">
-                                <i class="fas fa-newspaper mr-2 text-blue-600"></i>뉴스 관리
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h5 class="font-medium mb-2">뉴스 작성 방법:</h5>
-                                    <ul class="text-gray-600 space-y-1 text-sm">
-                                        <li>1. CMS 관리자 페이지 접속</li>
-                                        <li>2. "교회 소식" 메뉴 클릭</li>
-                                        <li>3. "New 교회 소식" 버튼 클릭</li>
-                                        <li>4. 제목, 내용, 카테고리 입력</li>
-                                        <li>5. 이미지 첨부 (선택사항)</li>
-                                        <li>6. "Publish" → "Save" 클릭</li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h5 class="font-medium mb-2">자동 기능:</h5>
-                                    <ul class="text-gray-600 space-y-1 text-sm">
-                                        <li>• 작성일 자동 기록</li>
-                                        <li>• GitHub 자동 커밋</li>
-                                        <li>• 웹사이트 자동 배포</li>
-                                        <li>• 실시간 미리보기</li>
-                                        <li>• 마크다운 에디터</li>
-                                        <li>• 이미지 자동 최적화</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-4">
-                                <i class="fas fa-folder-open mr-2 text-green-600"></i>자료실 관리
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h5 class="font-medium mb-2">파일 업로드:</h5>
-                                    <ul class="text-gray-600 space-y-1 text-sm">
-                                        <li>• PDF, DOC, MP3 등 지원</li>
-                                        <li>• 드래그&드롭 업로드</li>
-                                        <li>• 자동 파일 관리</li>
-                                        <li>• 다운로드 링크 생성</li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h5 class="font-medium mb-2">자료 분류:</h5>
-                                    <ul class="text-gray-600 space-y-1 text-sm">
-                                        <li>• 성경연구 자료</li>
-                                        <li>• 찬양 악보</li>
-                                        <li>• 교회 달력</li>
-                                        <li>• 기타 자료</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step-card">
-                            <h4 class="text-lg font-semibold mb-4">
-                                <i class="fas fa-cog mr-2 text-purple-600"></i>사이트 설정 관리
-                            </h4>
-                            <div class="text-gray-600">
-                                <p class="mb-3">CMS에서 다음 정보들을 쉽게 수정할 수 있습니다:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <h5 class="font-medium mb-2">기본 정보:</h5>
-                                        <ul class="space-y-1 text-sm">
-                                            <li>• 교회명</li>
-                                            <li>• 교회 설명</li>
-                                            <li>• 연락처</li>
-                                            <li>• 주소</li>
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h5 class="font-medium mb-2">예배 정보:</h5>
-                                        <ul class="space-y-1 text-sm">
-                                            <li>• 주일예배 시간</li>
-                                            <li>• 오후예배 시간</li>
-                                            <li>• 새벽기도 시간</li>
-                                            <li>• 기타 예배</li>
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h5 class="font-medium mb-2">헌금 정보:</h5>
-                                        <ul class="space-y-1 text-sm">
-                                            <li>• 은행명</li>
-                                            <li>• 계좌번호</li>
-                                            <li>• 예금주</li>
-                                            <li>• 안내 메시지</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Start Box -->
-            <div class="mt-8">
-                <div class="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-lg text-center">
-                    <h3 class="text-xl font-bold mb-2">
-                        <i class="fas fa-rocket mr-2"></i>빠른 시작
-                    </h3>
-                    <p class="mb-4">5분 만에 완전한 교회 웹사이트 + CMS 구축하기</p>
-                    <div class="flex justify-center space-x-4">
-                        <button onclick="downloadCMSFiles()" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                            <i class="fas fa-download mr-2"></i>파일 다운로드
-                        </button>
-                        <a href="https://netlify.com" target="_blank" class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition">
-                            <i class="fas fa-external-link-alt mr-2"></i>Netlify 시작하기
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white">
-        <div class="container mx-auto px-4 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Church Info -->
-                <div>
-                    <h3 class="text-xl font-semibold mb-4" id="footer-church-title">오산대광교회 & DGM TV</h3>
-                    <p class="text-gray-300 mb-4" id="footer-message">지역을 넘어, 세계로 주님의 사랑을 전합니다.</p>
-                </div>
-
-                <!-- Service Times -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4" id="service-times-title">예배시간</h4>
-                    <ul class="space-y-2 text-gray-300">
-                        <li id="sunday-service">• 주일예배: 일요일 오전 11시</li>
-                        <li id="afternoon-service">• 오후예배: 일요일 오후 2시</li>
-                        <li id="dawn-prayer">• 새벽기도: 일요일 오전 4시</li>
-                        <li>
-                            <button onclick="showDonationModal()" class="donation-btn">
-                                💝 <span id="online-donation">온라인 헌금</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4" id="contact-title">연락처</h4>
-                    <ul class="space-y-2 text-gray-300">
-                        <li>
-                            <a href="tel:031-377-0675" class="hover:text-white transition">
-                                <i class="fas fa-phone mr-2"></i>031-377-0675
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/cdn-cgi/l/email-protection#f39796819698c2cbc2c4b39d92859681dd909c9e" class="hover:text-white transition">
-                                <i class="fas fa-envelope mr-2"></i><span class="__cf_email__" data-cfemail="71151403141a40494046311f100714035f121e1c">[email&#160;protected]</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://maps.google.com/?q=경기도 오산시 궐리사로46번길 60-5" target="_blank" class="hover:text-white transition">
-                                <i class="fas fa-map-marker-alt mr-2"></i><span id="church-address">경기도 오산시 궐리사로46번길 60-5</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
-                <p class="text-gray-400">© 2025 <span id="footer-copyright">오산대광교회 & DGM TV</span>. All rights reserved.</p>
-                <p class="text-gray-500 text-sm mt-2">
-                    <i class="fas fa-cog mr-1"></i>Netlify CMS로 관리되는 웹사이트
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    {{ site.data.settings.title | default: "오산대광교회 & DGM TV" }}
+                </h2>
+                <p class="text-xl mb-8">
+                    {{ site.data.settings.description | default: "지역을 넘어, 세계로 주님의 사랑을 전합니다." }}
                 </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    {% if site.data.settings.social.youtube_osandae %}
+                    <a href="{{ site.data.settings.social.youtube_osandae }}" target="_blank" 
+                       class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                        <i class="fas fa-church mr-2"></i>오산대광교회 채널
+                    </a>
+                    {% endif %}
+                    {% if site.data.settings.social.youtube_dgmtv %}
+                    <a href="{{ site.data.settings.social.youtube_dgmtv }}" target="_blank"
+                       class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition">
+                        <i class="fas fa-video mr-2"></i>DGM TV 채널
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 뉴스 섹션 -->
+    <section id="news" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center text-gray-800 mb-12">최신 소식</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% assign news_posts = site.posts | where: "categories", "news" | sort: "date" | reverse %}
+                {% for post in news_posts limit: 6 %}
+                <article class="news-item bg-white rounded-lg shadow-lg overflow-hidden">
+                    {% if post.image %}
+                    <img src="{{ post.image }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+                    {% endif %}
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs text-white bg-blue-500 px-2 py-1 rounded">
+                                {{ post.category | default: '일반' }}
+                            </span>
+                            <span class="text-sm text-gray-500">
+                                {{ post.date | date: "%Y년 %m월 %d일" }}
+                            </span>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-3">{{ post.title }}</h4>
+                        {% if post.excerpt %}
+                        <p class="text-gray-600">{{ post.excerpt }}</p>
+                        {% else %}
+                        <p class="text-gray-600">{{ post.content | strip_html | truncate: 100 }}</p>
+                        {% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+                
+                {% if news_posts.size == 0 %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">CMS에서 첫 번째 뉴스를 작성해보세요!</p>
+                    <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        CMS 관리자로 이동
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- 자료 섹션 -->
+    <section id="resources" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center text-gray-800 mb-12">교회 자료</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% assign resource_posts = site.posts | where: "categories", "resources" | sort: "date" | reverse %}
+                {% for post in resource_posts limit: 6 %}
+                <article class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-white bg-green-500 px-2 py-1 rounded">
+                            {{ post.type | default: '자료' }}
+                        </span>
+                        <span class="text-sm text-gray-500">
+                            {{ post.date | date: "%Y년 %m월 %d일" }}
+                        </span>
+                    </div>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">{{ post.title }}</h4>
+                    {% if post.description %}
+                    <p class="text-gray-600 mb-4">{{ post.description }}</p>
+                    {% endif %}
+                    {% if post.file %}
+                    <a href="{{ post.file }}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-2">
+                        <i class="fas fa-download mr-2"></i>다운로드
+                    </a>
+                    {% endif %}
+                    {% if post.download_url %}
+                    <a href="{{ post.download_url }}" target="_blank" class="inline-flex items-center text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-external-link-alt mr-2"></i>링크 열기
+                    </a>
+                    {% endif %}
+                </article>
+                {% endfor %}
+                
+                {% if resource_posts.size == 0 %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">CMS에서 첫 번째 자료를 업로드해보세요!</p>
+                    <a href="/admin/" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                        CMS 관리자로 이동
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- 연락처 섹션 -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center text-gray-800 mb-12">교회 정보</h3>
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 연락처 정보 -->
+                    <div class="bg-gray-50 rounded-lg p-8">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-6">연락처</h4>
+                        <div class="space-y-4">
+                            {% if site.data.settings.phone %}
+                            <div class="flex items-center">
+                                <i class="fas fa-phone text-indigo-600 mr-4 w-5"></i>
+                                <a href="tel:{{ site.data.settings.phone }}" class="text-gray-700 hover:text-indigo-600">
+                                    {{ site.data.settings.phone }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% if site.data.settings.email %}
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-indigo-600 mr-4 w-5"></i>
+                                <a href="mailto:{{ site.data.settings.email }}" class="text-gray-700 hover:text-indigo-600">
+                                    {{ site.data.settings.email }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% if site.data.settings.address %}
+                            <div class="flex items-start">
+                                <i class="fas fa-map-marker-alt text-indigo-600 mr-4 w-5 mt-1"></i>
+                                <span class="text-gray-700">{{ site.data.settings.address }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- 예배 시간 -->
+                    <div class="bg-gray-50 rounded-lg p-8">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-6">예배 시간</h4>
+                        <div class="space-y-3">
+                            {% if site.data.settings.service_times.sunday %}
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-indigo-600 mr-4 w-5"></i>
+                                <span class="text-gray-700">{{ site.data.settings.service_times.sunday }}</span>
+                            </div>
+                            {% endif %}
+                            {% if site.data.settings.service_times.afternoon %}
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-indigo-600 mr-4 w-5"></i>
+                                <span class="text-gray-700">{{ site.data.settings.service_times.afternoon }}</span>
+                            </div>
+                            {% endif %}
+                            {% if site.data.settings.service_times.dawn %}
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-indigo-600 mr-4 w-5"></i>
+                                <span class="text-gray-700">{{ site.data.settings.service_times.dawn }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- 온라인 헌금 -->
+                            {% if site.data.settings.donation %}
+                            <div class="pt-4 border-t border-gray-200">
+                                <button onclick="showDonationModal()" class="donation-btn w-full justify-center">
+                                    💝 온라인 헌금
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <div class="mb-6">
+                    <i class="fas fa-church text-3xl text-indigo-400 mb-4"></i>
+                    <h4 class="text-2xl font-semibold">
+                        {{ site.data.settings.title | default: "오산대광교회 & DGM TV" }}
+                    </h4>
+                </div>
+                <p class="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">
+                    {{ site.data.settings.footer_text | default: "지역을 넘어, 세계로 주님의 사랑을 전합니다." }}
+                </p>
+                
+                <!-- 소셜 미디어 링크 -->
+                {% if site.data.settings.social %}
+                <div class="flex justify-center space-x-6 mb-6">
+                    {% if site.data.settings.social.youtube_osandae %}
+                    <a href="{{ site.data.settings.social.youtube_osandae }}" target="_blank" 
+                       class="text-gray-300 hover:text-white transition">
+                        <i class="fab fa-youtube text-2xl"></i>
+                        <span class="sr-only">오산대광교회 YouTube</span>
+                    </a>
+                    {% endif %}
+                    {% if site.data.settings.social.youtube_dgmtv %}
+                    <a href="{{ site.data.settings.social.youtube_dgmtv }}" target="_blank" 
+                       class="text-gray-300 hover:text-white transition">
+                        <i class="fab fa-youtube text-2xl"></i>
+                        <span class="sr-only">DGM TV YouTube</span>
+                    </a>
+                    {% endif %}
+                    {% if site.data.settings.social.facebook %}
+                    <a href="{{ site.data.settings.social.facebook }}" target="_blank" 
+                       class="text-gray-300 hover:text-white transition">
+                        <i class="fab fa-facebook text-2xl"></i>
+                        <span class="sr-only">Facebook</span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="border-t border-gray-700 pt-6">
+                    <p class="text-sm text-gray-400">
+                        © {{ 'now' | date: "%Y" }} {{ site.data.settings.title | default: "오산대광교회 & DGM TV" }}. All rights reserved.
+                    </p>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Donation Modal -->
-    <div class="donation-modal" id="donationModal">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4" id="donation-title">온라인 헌금</h3>
-            <div class="bg-gray-100 p-4 rounded-lg mb-4">
-                <p class="font-medium" id="bank-name">농협은행</p>
-                <p class="text-2xl font-bold text-blue-600" id="account-number">170354-55-000829</p>
-                <p class="text-sm text-gray-600" id="account-holder">예금주: 오산산성교회</p>
+    <!-- 온라인 헌금 모달 -->
+    {% if site.data.settings.donation %}
+    <div id="donationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4 text-center">온라인 헌금</h3>
+            <div class="bg-gray-100 p-4 rounded-lg mb-4 text-center">
+                <p class="font-medium text-gray-800">{{ site.data.settings.donation.bank }}</p>
+                <p class="text-2xl font-bold text-blue-600 my-2">{{ site.data.settings.donation.account }}</p>
+                <p class="text-sm text-gray-600">예금주: {{ site.data.settings.donation.holder }}</p>
             </div>
-            <button onclick="copyAccount()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition mb-4">
-                <i class="fas fa-copy mr-2"></i><span id="copy-account">계좌 복사</span>
-            </button>
-            <p class="text-sm text-gray-600 mb-4" id="donation-message">헌금은 하나님께 드리는 예배의 한 부분입니다.<br>기쁨과 감사함으로 드려주세요.</p>
-            <button onclick="closeDonationModal()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition">
-                <span id="close-btn">닫기</span>
-            </button>
+            <div class="flex space-x-3">
+                <button onclick="copyAccount()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-copy mr-2"></i>계좌 복사
+                </button>
+                <button onclick="closeDonationModal()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition">
+                    닫기
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 text-center mt-4">
+                헌금은 하나님께 드리는 예배의 한 부분입니다.<br>기쁨과 감사함으로 드려주세요.
+            </p>
         </div>
     </div>
+    {% endif %}
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        // Global Variables
-        const API_KEY = 'AIzaSyByC1DmDF0Em4EsmuwKdYQOyd2Z8RyoIAM';
-        const OSANDAE_CHANNEL_ID = 'UCcwM7j_1eMYRkFMrjUPVPRw';
-        const DGMTV_CHANNEL_ID = 'UCARlnnL9L0Y6ZTxeVAV6j0g';
-        
-        let isKorean = true;
-        let currentChannel = 'osandae';
-        let selectedCategory = '';
-        let allVideos = {};
+    <script>
+        // 모바일 메뉴 토글
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
 
-        // Language Toggle
-        function toggleLanguage() {
-            isKorean = !isKorean;
-            updateLanguageButton();
-            updateAllTexts();
-            updateCategories();
-        }
-
-        function updateLanguageButton() {
-            // Desktop
-            const koOption = document.getElementById('ko-option');
-            const enOption = document.getElementById('en-option');
-            
-            // Mobile
-            const mobileKoOption = document.getElementById('mobile-ko-option');
-            const mobileEnOption = document.getElementById('mobile-en-option');
-            
-            if (isKorean) {
-                koOption.classList.add('active');
-                enOption.classList.remove('active');
-                mobileKoOption.classList.add('active');
-                mobileEnOption.classList.remove('active');
-            } else {
-                koOption.classList.remove('active');
-                enOption.classList.add('active');
-                mobileKoOption.classList.remove('active');
-                mobileEnOption.classList.add('active');
-            }
-        }
-
-        function updateAllTexts() {
-            const texts = {
-                'site-title': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
-                'main-title-line1': isKorean ? '진리의 말씀, 사랑의 나눔' : 'Word of Truth, Sharing Love',
-                'main-title-line2': isKorean ? '여기서 시작되어 세계로 뻗어갑니다' : 'Starting here, reaching out to the world',
-                'osandae-channel-btn': isKorean ? '오산대광교회 채널' : 'Osandae Church Channel',
-                'dgmtv-channel-btn': isKorean ? 'DGM TV 채널' : 'DGM TV Channel',
-                'nav-home': isKorean ? '홈' : 'Home',
-                'nav-videos': isKorean ? '영상' : 'Videos',
-                'nav-news': isKorean ? '뉴스' : 'News',
-                'nav-resources': isKorean ? '자료실' : 'Resources',
-                'nav-cms': isKorean ? 'CMS 설정' : 'CMS Setup',
-                'mobile-nav-home': isKorean ? '홈' : 'Home',
-                'mobile-nav-videos': isKorean ? '영상' : 'Videos',
-                'mobile-nav-news': isKorean ? '뉴스' : 'News',
-                'mobile-nav-resources': isKorean ? '자료실' : 'Resources',
-                'mobile-nav-cms': isKorean ? 'CMS 설정' : 'CMS Setup',
-                'video-section-title': isKorean ? '영상 컨텐츠' : 'Video Contents',
-                'news-section-title': isKorean ? '교회 소식' : 'Church News',
-                'resources-section-title': isKorean ? '교회 자료실' : 'Church Resources',
-                'osandae-btn-text': isKorean ? '오산대광교회' : 'Osandae Church',
-                'dgmtv-btn-text': isKorean ? 'DGM TV' : 'DGM TV',
-                'loading-text': isKorean ? '영상을 불러오는 중...' : 'Loading videos...',
-                'news-cms-note': isKorean ? '※ Netlify CMS 설정 완료 후 관리자 페이지에서 뉴스를 쉽게 작성하고 관리할 수 있습니다.' : '※ After Netlify CMS setup, you can easily create and manage news from the admin page.',
-                'resources-cms-note': isKorean ? '※ Netlify CMS에서 파일 업로드 및 자료 관리가 가능합니다.' : '※ File upload and resource management is available in Netlify CMS.',
-                'footer-church-title': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
-                'footer-message': isKorean ? '지역을 넘어, 세계로 주님의 사랑을 전합니다.' : 'Beyond regions, spreading God\'s love to the world.',
-                'service-times-title': isKorean ? '예배시간' : 'Service Times',
-                'sunday-service': isKorean ? '• 주일예배: 일요일 오전 11시' : '• Sunday Service: Sunday 11:00 AM',
-                'afternoon-service': isKorean ? '• 오후예배: 일요일 오후 2시' : '• Afternoon Service: Sunday 2:00 PM',
-                'dawn-prayer': isKorean ? '• 새벽기도: 일요일 오전 4시' : '• Dawn Prayer: Sunday 4:00 AM',
-                'online-donation': isKorean ? '온라인 헌금' : 'Online Donation',
-                'contact-title': isKorean ? '연락처' : 'Contact',
-                'church-address': isKorean ? '경기도 오산시 궐리사로46번길 60-5' : '60-5 Gwolrisa-ro 46beon-gil, Osan-si, Gyeonggi-do',
-                'footer-copyright': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
-                'donation-title': isKorean ? '온라인 헌금' : 'Online Donation',
-                'bank-name': isKorean ? '농협은행' : 'Nonghyup Bank',
-                'account-holder': isKorean ? '예금주: 오산산성교회' : 'Account Holder: Osansan Church',
-                'copy-account': isKorean ? '계좌 복사' : 'Copy Account',
-                'donation-message': isKorean ? '헌금은 하나님께 드리는 예배의 한 부분입니다.<br>기쁨과 감사함으로 드려주세요.' : 'Offerings are part of worship to God.<br>Please give with joy and gratitude.',
-                'close-btn': isKorean ? '닫기' : 'Close'
-            };
-
-            Object.keys(texts).forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.innerHTML = texts[id];
-                }
-            });
-        }
-
-        // Categories
-        const categories = {
-            osandae: {
-                ko: [
-                    { emoji: '🙏', name: '온라인예배', key: 'worship' },
-                    { emoji: '📖', name: '설교영상', key: 'sermon' },
-                    { emoji: '🎧', name: '팟캐스트', key: 'podcast' },
-                    { emoji: '🎵', name: '우쿨찬양', key: 'ukulele' },
-                    { emoji: '❓', name: '성경퀴즈', key: 'quiz' },
-                    { emoji: '❤️', name: '묵상', key: 'meditation' }
-                ],
-                en: [
-                    { emoji: '🙏', name: 'Online Worship', key: 'worship' },
-                    { emoji: '📖', name: 'Sermons', key: 'sermon' },
-                    { emoji: '🎧', name: 'Podcast', key: 'podcast' },
-                    { emoji: '🎵', name: 'Ukulele Praise', key: 'ukulele' },
-                    { emoji: '❓', name: 'Bible Quiz', key: 'quiz' },
-                    { emoji: '❤️', name: 'Meditation', key: 'meditation' }
-                ]
-            },
-            dgmtv: {
-                ko: [
-                    { emoji: '📖', name: '설교영상', key: 'sermon' },
-                    { emoji: '🎧', name: '팟캐스트', key: 'podcast' },
-                    { emoji: '❓', name: '성경퀴즈', key: 'quiz' },
-                    { emoji: '❤️', name: '묵상', key: 'meditation' }
-                ],
-                en: [
-                    { emoji: '📖', name: 'Sermons', key: 'sermon' },
-                    { emoji: '🎧', name: 'Podcast', key: 'podcast' },
-                    { emoji: '❓', name: 'Bible Quiz', key: 'quiz' },
-                    { emoji: '❤️', name: 'Meditation', key: 'meditation' }
-                ]
-            }
-        };
-
-        function updateCategories() {
-            const container = document.getElementById('category-container');
-            const lang = isKorean ? 'ko' : 'en';
-            const categoryList = categories[currentChannel][lang];
-            
-            container.innerHTML = categoryList.map(cat => 
-                `<button class="category-btn" onclick="selectCategory('${cat.key}')">
-                    <span class="category-emoji">${cat.emoji}</span>
-                    ${cat.name}
-                </button>`
-            ).join('');
-        }
-
-        // Channel Selection
-        function selectChannel(channel) {
-            currentChannel = channel;
-            selectedCategory = '';
-            
-            // Update buttons
-            const osandaeBtn = document.getElementById('osandae-btn');
-            const dgmtvBtn = document.getElementById('dgmtv-btn');
-            
-            if (channel === 'osandae') {
-                osandaeBtn.className = 'channel-btn active';
-                dgmtvBtn.className = 'channel-btn inactive';
-            } else {
-                osandaeBtn.className = 'channel-btn inactive';
-                dgmtvBtn.className = 'channel-btn active';
-            }
-            
-            updateCategories();
-            clearVideoDisplay();
-            
-            if (!allVideos[channel]) {
-                loadChannelVideos(channel);
-            }
-        }
-
-        function selectCategory(categoryKey) {
-            selectedCategory = categoryKey;
-            
-            // Update category buttons
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            displayCategoryVideos(currentChannel, categoryKey);
-        }
-
-        // Video Loading
-        async function loadChannelVideos(channel) {
-            try {
-                const channelId = channel === 'osandae' ? OSANDAE_CHANNEL_ID : DGMTV_CHANNEL_ID;
-                const response = await fetch(
-                    `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&type=video&maxResults=50&key=${API_KEY}`
-                );
-                
-                if (!response.ok) throw new Error('API Error');
-                
-                const data = await response.json();
-                allVideos[channel] = data.items || [];
-                
-                document.getElementById('loading-indicator').style.display = 'none';
-                
-            } catch (error) {
-                console.error('Error loading videos:', error);
-                document.getElementById('loading-indicator').style.display = 'none';
-            }
-        }
-
-        function filterVideosByCategory(videos, channel, categoryKey) {
-            const filters = {
-                osandae: {
-                    worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
-                    sermon: video => {
-                        const title = video.snippet.title.toLowerCase();
-                        return title.includes('[kr/en/jp/cn sub]');
-                    },
-                    podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
-                    ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
-                    quiz: video => /퀴즈|quiz/i.test(video.snippet.title),
-                    meditation: video => /오늘.*한.*말씀.*한.*기도|묵상/i.test(video.snippet.title)
-                },
-                dgmtv: {
-                    sermon: video => {
-                        const title = video.snippet.title.toLowerCase();
-                        return title.includes('sermon');
-                    },
-                    podcast: video => /faithtalk|podcast/i.test(video.snippet.title),
-                    quiz: video => /bible trivia|quiz/i.test(video.snippet.title),
-                    meditation: video => /today.*one.*verse.*one.*prayer|prayer/i.test(video.snippet.title)
-                }
-            };
-            
-            return videos.filter(filters[channel][categoryKey] || (() => false)).slice(0, 2);
-        }
-
-        function displayCategoryVideos(channel, categoryKey) {
-            const videos = allVideos[channel] || [];
-            const filteredVideos = filterVideosByCategory(videos, channel, categoryKey);
-            
-            const container = document.getElementById('video-container');
-            
-            if (filteredVideos.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-video-slash text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">${isKorean ? '해당 카테고리의 영상을 찾을 수 없습니다.' : 'No videos found for this category.'}</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = filteredVideos.map(video => `
-                <div class="video-card" onclick="openVideo('${video.id.videoId}')">
-                    <img src="https://img.youtube.com/vi/${video.id.videoId}/mqdefault.jpg" 
-                         alt="${video.snippet.title}" class="video-thumbnail">
-                    <div class="video-info">
-                        <h3 class="video-title">${video.snippet.title}</h3>
-                        <p class="video-meta">
-                            ${new Date(video.snippet.publishedAt).toLocaleDateString(isKorean ? 'ko-KR' : 'en-US')}
-                        </p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function clearVideoDisplay() {
-            document.getElementById('video-container').innerHTML = '';
-        }
-
-        function openVideo(videoId) {
-            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-        }
-
-        // Tab Navigation
-        function showTab(tabId) {
-            // Hide all tab contents
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Remove active class from all tab buttons
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Show selected tab
-            document.getElementById(tabId).classList.add('active');
-            
-            // Activate clicked button
-            event.target.classList.add('active');
-        }
-
-        // Download CMS Files
-        function downloadCMSFiles() {
-            alert(isKorean ? 
-                'CMS 파일들을 생성합니다!\n\n1. admin/index.html\n2. admin/config.yml\n3. _data/settings.yml\n4. 필요한 폴더 구조\n\n이 파일들을 GitHub 저장소에 업로드하세요.' :
-                'Generating CMS files!\n\n1. admin/index.html\n2. admin/config.yml\n3. _data/settings.yml\n4. Required folder structure\n\nUpload these files to your GitHub repository.'
-            );
-        }
-
-        // Donation Modal
+        // 온라인 헌금 모달
         function showDonationModal() {
-            document.getElementById('donationModal').classList.add('show');
+            document.getElementById('donationModal').classList.remove('hidden');
+            document.getElementById('donationModal').classList.add('flex');
         }
 
         function closeDonationModal() {
-            document.getElementById('donationModal').classList.remove('show');
+            document.getElementById('donationModal').classList.add('hidden');
+            document.getElementById('donationModal').classList.remove('flex');
         }
 
         function copyAccount() {
-            navigator.clipboard.writeText('170354-55-000829').then(() => {
-                alert(isKorean ? '계좌번호가 복사되었습니다.' : 'Account number copied.');
+            const accountNumber = '{{ site.data.settings.donation.account }}';
+            navigator.clipboard.writeText(accountNumber).then(function() {
+                alert('계좌번호가 복사되었습니다: ' + accountNumber);
+            }, function() {
+                alert('복사에 실패했습니다. 수동으로 복사해주세요: ' + accountNumber);
             });
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCategories();
-            loadChannelVideos('osandae');
-            
-            // Smooth scrolling
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('donationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDonationModal();
+            }
+        });
+
+        // 부드러운 스크롤
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
         });
+
+        // Netlify Identity
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
     </script>
+
 </body>
 </html>
-    <script id="html_badge_script1">
-        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDrul%2Fun69wd5ZVaNUGAorOJdcXgcCLM8GYysZqxUHXJk8WAJbg7Ew7UMW9E%2B5eEBf4%2FqszmOlXdc1JhqILKBRrbMuACsvWWzH6Gn7A7jWRhqJX1PyMMHkR7r3lOWonM%2BpnAE6STNR4t6rOckcD6GjCcNRBKQkIw82QSvFO7bvQwRJJlO06rP%2Fo4FicLy89O6pLwTD61HhbvRqGs534DVni4c0VpTW8C8%2B%2FSjzW1hTVgwAOUVHmmcmjpjJjwZpCKjVLPA34wIcZySg39idrV2QtFXzRBKlnZqQdUBVsnTREV3AzguMdMyroG6o%2FLcKJKMyPlubAUNbbYrZFc7hWirSFSoVFTgsTYesEJNMrtJ3jSrHWMJMCf9E5vGGT62or4C%2BChaGltyyays1dM3TmL%2FD%2FOWOVzkMl7rovQ7L4i%2FAI2q2OGgPhp3pcFemqEVeUfKgn0dXhcRryZ8IoPTZyxjPCmlsvsTkSk0fZPw1%2FkERr9ixlIiF%2Bj9Ltbek%2FMOeooVm%2FeX9mgnF145pueaCmY3lQU%3D";
-        window.__genspark_locale = "ko-KR";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDrul/un69wd5ZVaNUGAorOJdcXgcCLM8GYysZqxUHXJk8WAJbg7Ew7UMW9E+5eEBf4/qszmOlXdc1JhqILKBRrbMuACsvWWzH6Gn7A7jWRhqJX1PyMMHkR7r3lOWonM+pnAE6STNR4t6rOckcD6GjCcNRBKQkIw82QSvFO7bvQwRJJlO06rP/o4FicLy89O6pLwTD61HhbvRqGs534DVni4c0VpTW8C8+/SjzW1hTVgwAOUVHmmcmjpjJjwZpCKjVLPA34wIcZySg39idrV2QtFXzRBKlnZqQdUBVsnTREV3AzguMdMyroG6o/LcKJKMyPlubAUNbbYrZFc7hWirSFSoVFTgsTYesEJNMrtJ3jSrHWMJMCf9E5vGGT62or4C+ChaGltyyays1dM3TmL/D/OWOVzkMl7rovQ7L4i/AI2q2OGgPhp3pcFemqEVeUfKgn0dXhcRryZ8IoPTZyxjPCmlsvsTkSk0fZPw1/kERr9ixlIiF+j9Ltbek/MOeooVm/eX9mgnF145pueaCmY3lQU=";
-    </script>
-    
-    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
-    
