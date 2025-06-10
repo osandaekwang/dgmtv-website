@@ -1,6 +1,21 @@
-title: 오산대광교회 & DGM TV
-description: 영감을 주는 이야기와 음악이 만나는 곳
-phone: 031-377-0675
-email: derek1817@naver.com
-address: 경기도 오산시 궐리사로46번길 60-5
-footer_text: 하나님의 사랑을 실천하며 지역사회와 함께 성장하는 교회
+title: "오산대광교회 & DGM TV"
+description: "지역을 넘어, 세계로 주님의 사랑을 전합니다."
+phone: "031-377-0675"
+email: "derek1817@naver.com"
+address: "경기도 오산시 궐리사로46번길 60-5"
+footer_text: "지역을 넘어, 세계로 주님의 사랑을 전합니다."
+
+social:
+  youtube_osandae: "https://www.youtube.com/channel/UCcwM7j_1eMYRkFMrjUPVPRw"
+  youtube_dgmtv: "https://www.youtube.com/channel/UCARlnnL9L0Y6ZTxeVAV6j0g"
+  facebook: ""
+
+service_times:
+  sunday: "주일예배: 일요일 오전 11시"
+  afternoon: "오후예배: 일요일 오후 2시"
+  dawn: "새벽기도: 일요일 오전 4시"
+
+donation:
+  bank: "농협은행"
+  account: "170354-55-000829"
+  holder: "오산산성교회"
