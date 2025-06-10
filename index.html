@@ -7,8 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Netlify Identity Widget -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- 기존 스타일 유지 (동일) -->
     <style>
         * {
             margin: 0;
@@ -331,10 +332,100 @@
             color: white;
             text-decoration: none;
         }
+
+        /* 모달 관련 스타일 추가 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-body {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-content-body {
+            padding: 24px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .prose {
+            max-width: none;
+        }
+
+        .prose p {
+            margin-bottom: 16px;
+        }
+
+        .prose h1, .prose h2, .prose h3 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+
+        .prose ul, .prose ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        .prose img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- 기존 헤더, 히어로 섹션, 영상 섹션 동일 -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
@@ -343,7 +434,6 @@
                     <h1 class="text-2xl font-bold text-gray-800" id="site-title">오산대광교회 & DGM TV</h1>
                 </div>
                 
-                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-6">
                     <nav class="flex space-x-6">
                         <a href="#videos" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-videos">영상</a>
@@ -351,7 +441,6 @@
                         <a href="#resources" class="text-gray-600 hover:text-indigo-600 font-medium" id="nav-resources">자료실</a>
                     </nav>
                     
-                    <!-- Desktop Language Toggle -->
                     <div class="language-toggle desktop-language" onclick="toggleLanguage()">
                         <div class="language-option active" id="ko-option">KO</div>
                         <div class="language-option" id="en-option">EN</div>
@@ -359,7 +448,6 @@
                 </div>
             </div>
             
-            <!-- Mobile Navigation -->
             <div class="md:hidden mobile-nav">
                 <a href="#videos" id="mobile-nav-videos">영상</a>
                 <a href="#news" id="mobile-nav-news">뉴스</a>
@@ -368,7 +456,6 @@
         </div>
     </header>
 
-    <!-- Mobile Floating Language Button -->
     <div class="mobile-language-float" onclick="toggleLanguage()">
         <div class="language-toggle">
             <div class="language-option active" id="mobile-ko-option">KO</div>
@@ -376,7 +463,6 @@
         </div>
     </div>
 
-    <!-- Hero Section -->
     <section class="hero-section text-white">
         <div class="container mx-auto px-4 text-center">
             <div>
@@ -397,12 +483,10 @@
         </div>
     </section>
 
-    <!-- Video Content Section -->
     <section id="videos" class="section bg-gray-50">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="video-section-title">영상 컨텐츠</h2>
             
-            <!-- Channel Selection -->
             <div class="text-center mb-6">
                 <button class="channel-btn active" id="osandae-btn" onclick="selectChannel('osandae')">
                     <i class="fas fa-church mr-2"></i><span id="osandae-btn-text">오산대광교회</span>
@@ -412,32 +496,22 @@
                 </button>
             </div>
 
-            <!-- Category Buttons -->
-            <div class="category-grid" id="category-container">
-                <!-- Categories will be populated by JavaScript -->
-            </div>
+            <div class="category-grid" id="category-container"></div>
 
-            <!-- Loading Indicator -->
             <div id="loading-indicator" class="text-center py-8">
                 <div class="loading-spinner"></div>
                 <p class="mt-2 text-gray-600" id="loading-text">영상을 불러오는 중...</p>
             </div>
 
-            <!-- Video Grid -->
-            <div class="video-grid" id="video-container">
-                <!-- Videos will be populated by JavaScript -->
-            </div>
+            <div class="video-grid" id="video-container"></div>
         </div>
     </section>
 
-    <!-- News Section -->
     <section id="news" class="section bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="news-section-title">기독교 뉴스</h2>
             
-            <!-- CMS 연동 뉴스 컨테이너 -->
             <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 뉴스는 JavaScript로 동적 로드 -->
                 <div class="col-span-full text-center py-12">
                     <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
                     <p class="text-gray-500" id="news-placeholder">뉴스 컨텐츠가 준비 중입니다.</p>
@@ -449,14 +523,11 @@
         </div>
     </section>
 
-    <!-- Resources Section -->
     <section id="resources" class="section bg-gray-50">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-8" id="resources-section-title">자료실</h2>
             
-            <!-- CMS 연동 자료 컨테이너 -->
             <div id="resources-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 자료는 JavaScript로 동적 로드 -->
                 <div class="col-span-full text-center py-12">
                     <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
                     <p class="text-gray-500" id="resources-placeholder">자료실 컨텐츠가 준비 중입니다.</p>
@@ -468,17 +539,15 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- 기존 Footer 동일 -->
     <footer class="bg-gray-800 text-white">
         <div class="container mx-auto px-4 py-12">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Church Info -->
                 <div>
                     <h3 class="text-xl font-semibold mb-4" id="footer-church-title">오산대광교회 & DGM TV</h3>
                     <p class="text-gray-300 mb-4" id="footer-message">지역을 넘어, 세계로 주님의 사랑을 전합니다.</p>
                 </div>
 
-                <!-- Service Times -->
                 <div>
                     <h4 class="text-lg font-semibold mb-4" id="service-times-title">예배시간</h4>
                     <ul class="space-y-2 text-gray-300">
@@ -493,7 +562,6 @@
                     </ul>
                 </div>
 
-                <!-- Contact -->
                 <div>
                     <h4 class="text-lg font-semibold mb-4" id="contact-title">연락처</h4>
                     <ul class="space-y-2 text-gray-300">
@@ -522,7 +590,7 @@
         </div>
     </footer>
 
-    <!-- Donation Modal -->
+    <!-- 헌금 모달 -->
     <div class="donation-modal" id="donationModal">
         <div class="modal-content">
             <h3 class="text-xl font-bold mb-4" id="donation-title">온라인 헌금</h3>
@@ -541,6 +609,45 @@
         </div>
     </div>
 
+    <!-- 뉴스 모달 -->
+    <div id="newsModal" class="modal">
+        <div class="modal-body">
+            <button class="modal-close" onclick="closeNewsModal()">&times;</button>
+            <div class="modal-header">
+                <div class="flex items-center gap-3 mb-2">
+                    <span id="newsModalCategory" class="text-xs text-white px-2 py-1 rounded bg-gray-500"></span>
+                    <span id="newsModalDate" class="text-sm text-gray-500"></span>
+                </div>
+                <h2 id="newsModalTitle" class="text-2xl font-bold text-gray-800 pr-8"></h2>
+                <p id="newsModalAuthor" class="text-sm text-gray-600 mt-1"></p>
+            </div>
+            <div class="modal-content-body">
+                <div id="newsModalImage" class="mb-6"></div>
+                <div id="newsModalExcerpt" class="text-lg text-gray-700 mb-6 font-medium"></div>
+                <div id="newsModalContent" class="prose text-gray-800 leading-relaxed"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 자료실 모달 -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-body">
+            <button class="modal-close" onclick="closeResourceModal()">&times;</button>
+            <div class="modal-header">
+                <div class="flex items-center gap-3 mb-2">
+                    <span id="resourceModalType" class="text-xs text-white px-2 py-1 rounded bg-gray-500"></span>
+                    <span id="resourceModalDate" class="text-sm text-gray-500"></span>
+                </div>
+                <h2 id="resourceModalTitle" class="text-2xl font-bold text-gray-800 pr-8"></h2>
+            </div>
+            <div class="modal-content-body">
+                <div id="resourceModalDescription" class="text-lg text-gray-700 mb-4 font-medium"></div>
+                <div id="resourceModalContent" class="prose text-gray-800 leading-relaxed mb-6"></div>
+                <div id="resourceModalLinks" class="flex gap-4 flex-wrap"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global Variables
         const API_KEY = 'AIzaSyCwXeVpVzZyRcD2Dovlv81rIp9IG2CTQ0s';
@@ -552,7 +659,7 @@
         let selectedCategory = '';
         let allVideos = {};
 
-        // Language Toggle
+        // Language Toggle Functions
         function toggleLanguage() {
             isKorean = !isKorean;
             updateLanguageButton();
@@ -561,11 +668,8 @@
         }
 
         function updateLanguageButton() {
-            // Desktop
             const koOption = document.getElementById('ko-option');
             const enOption = document.getElementById('en-option');
-            
-            // Mobile
             const mobileKoOption = document.getElementById('mobile-ko-option');
             const mobileEnOption = document.getElementById('mobile-en-option');
             
@@ -597,631 +701,4 @@
                 'mobile-nav-resources': isKorean ? '자료실' : 'Resources',
                 'video-section-title': isKorean ? '영상 컨텐츠' : 'Video Contents',
                 'news-section-title': isKorean ? '기독교 뉴스' : 'Christian News',
-                'resources-section-title': isKorean ? '자료실' : 'Resources',
-                'osandae-btn-text': isKorean ? '오산대광교회' : 'Osandae Church',
-                'dgmtv-btn-text': isKorean ? 'DGM TV' : 'DGM TV',
-                'loading-text': isKorean ? '영상을 불러오는 중...' : 'Loading videos...',
-                'news-placeholder': isKorean ? '뉴스 컨텐츠가 준비 중입니다.' : 'News content is being prepared.',
-                'resources-placeholder': isKorean ? '자료실 컨텐츠가 준비 중입니다.' : 'Resource content is being prepared.',
-                'footer-church-title': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
-                'footer-message': isKorean ? '지역을 넘어, 세계로 주님의 사랑을 전합니다.' : 'Beyond regions, spreading God\'s love to the world.',
-                'service-times-title': isKorean ? '예배시간' : 'Service Times',
-                'sunday-service': isKorean ? '• 주일예배: 일요일 오전 11시' : '• Sunday Service: Sunday 11:00 AM',
-                'afternoon-service': isKorean ? '• 오후예배: 일요일 오후 2시' : '• Afternoon Service: Sunday 2:00 PM',
-                'dawn-prayer': isKorean ? '• 새벽기도: 일요일 오전 4시' : '• Dawn Prayer: Sunday 4:00 AM',
-                'online-donation': isKorean ? '온라인 헌금' : 'Online Donation',
-                'contact-title': isKorean ? '연락처' : 'Contact',
-                'church-address': isKorean ? '경기도 오산시 궐리사로46번길 60-5' : '60-5 Gwolrisa-ro 46beon-gil, Osan-si, Gyeonggi-do',
-                'footer-copyright': isKorean ? '오산대광교회 & DGM TV' : 'Osandae Church & DGM TV',
-                'donation-title': isKorean ? '온라인 헌금' : 'Online Donation',
-                'bank-name': isKorean ? '농협은행' : 'Nonghyup Bank',
-                'account-holder': isKorean ? '예금주: 오산산성교회' : 'Account Holder: Osansan Church',
-                'copy-account': isKorean ? '계좌 복사' : 'Copy Account',
-                'donation-message': isKorean ? '헌금은 하나님께 드리는 예배의 한 부분입니다.<br>기쁨과 감사함으로 드려주세요.' : 'Offerings are part of worship to God.<br>Please give with joy and gratitude.',
-                'close-btn': isKorean ? '닫기' : 'Close'
-            };
-
-            Object.keys(texts).forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.innerHTML = texts[id];
-                }
-            });
-        }
-
-        // Categories
-        const categories = {
-            osandae: {
-                ko: [
-                    { emoji: '🙏', name: '온라인예배', key: 'worship' },
-                    { emoji: '📖', name: '설교영상', key: 'sermon' },
-                    { emoji: '🎧', name: '팟캐스트', key: 'podcast' },
-                    { emoji: '🎵', name: '우쿨찬양', key: 'ukulele' },
-                    { emoji: '❓', name: '성경퀴즈', key: 'quiz' },
-                    { emoji: '❤️', name: '묵상', key: 'meditation' }
-                ],
-                en: [
-                    { emoji: '🙏', name: 'Online Worship', key: 'worship' },
-                    { emoji: '📖', name: 'Sermons', key: 'sermon' },
-                    { emoji: '🎧', name: 'Podcast', key: 'podcast' },
-                    { emoji: '🎵', name: 'Ukulele Praise', key: 'ukulele' },
-                    { emoji: '❓', name: 'Bible Quiz', key: 'quiz' },
-                    { emoji: '❤️', name: 'Meditation', key: 'meditation' }
-                ]
-            },
-            dgmtv: {
-                ko: [
-                    { emoji: '📖', name: '설교영상', key: 'sermon' },
-                    { emoji: '🎧', name: '팟캐스트', key: 'podcast' },
-                    { emoji: '❓', name: '성경퀴즈', key: 'quiz' },
-                    { emoji: '❤️', name: '묵상', key: 'meditation' }
-                ],
-                en: [
-                    { emoji: '📖', name: 'Sermons', key: 'sermon' },
-                    { emoji: '🎧', name: 'Podcast', key: 'podcast' },
-                    { emoji: '❓', name: 'Bible Quiz', key: 'quiz' },
-                    { emoji: '❤️', name: 'Meditation', key: 'meditation' }
-                ]
-            }
-        };
-
-        function updateCategories() {
-            const container = document.getElementById('category-container');
-            const lang = isKorean ? 'ko' : 'en';
-            const categoryList = categories[currentChannel][lang];
-            
-            container.innerHTML = categoryList.map(cat => 
-                `<button class="category-btn" onclick="selectCategory('${cat.key}')">
-                    <span class="category-emoji">${cat.emoji}</span>
-                    ${cat.name}
-                </button>`
-            ).join('');
-        }
-
-        // Channel Selection
-        function selectChannel(channel) {
-            currentChannel = channel;
-            selectedCategory = '';
-            
-            // Update buttons
-            const osandaeBtn = document.getElementById('osandae-btn');
-            const dgmtvBtn = document.getElementById('dgmtv-btn');
-            
-            if (channel === 'osandae') {
-                osandaeBtn.className = 'channel-btn active';
-                dgmtvBtn.className = 'channel-btn inactive';
-            } else {
-                osandaeBtn.className = 'channel-btn inactive';
-                dgmtvBtn.className = 'channel-btn active';
-            }
-            
-            updateCategories();
-            clearVideoDisplay();
-            
-            if (!allVideos[channel]) {
-                loadChannelVideos(channel);
-            }
-        }
-
-        function selectCategory(categoryKey) {
-            selectedCategory = categoryKey;
-            
-            // Update category buttons
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            displayCategoryVideos(currentChannel, categoryKey);
-        }
-
-        // Video Loading
-        async function loadChannelVideos(channel) {
-            try {
-                const channelId = channel === 'osandae' ? OSANDAE_CHANNEL_ID : DGMTV_CHANNEL_ID;
-                const response = await fetch(
-                    `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&type=video&maxResults=50&key=${API_KEY}`
-                );
-                
-                if (!response.ok) throw new Error('API Error');
-                
-                const data = await response.json();
-                allVideos[channel] = data.items || [];
-                
-                document.getElementById('loading-indicator').style.display = 'none';
-                
-            } catch (error) {
-                console.error('Error loading videos:', error);
-                document.getElementById('loading-indicator').style.display = 'none';
-            }
-        }
-
-        function filterVideosByCategory(videos, channel, categoryKey) {
-            const filters = {
-                osandae: {
-                    worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
-                    sermon: video => {
-    const title = video.snippet.title.toLowerCase();
-    return title.includes('[kr/en/jp/cn sub]');
-},
-                    podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
-                    ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
-                    quiz: video => /퀴즈|quiz/i.test(video.snippet.title),
-                    meditation: video => /오늘.*한.*말씀.*한.*기도|묵상/i.test(video.snippet.title)
-                },
-                dgmtv: {
-                    sermon: video => {
-    const title = video.snippet.title.toLowerCase();
-    return title.includes('[sermon]');
-},
-                    podcast: video => /faithtalk|podcast/i.test(video.snippet.title),
-                    quiz: video => /bible trivia|quiz/i.test(video.snippet.title),
-                    meditation: video => /today.*one.*verse.*one.*prayer|prayer/i.test(video.snippet.title)
-                }
-            };
-            
-            return videos.filter(filters[channel][categoryKey] || (() => false)).slice(0, 2);
-        }
-
-        function displayCategoryVideos(channel, categoryKey) {
-            const videos = allVideos[channel] || [];
-            const filteredVideos = filterVideosByCategory(videos, channel, categoryKey);
-            
-            const container = document.getElementById('video-container');
-            
-            if (filteredVideos.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-video-slash text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">${isKorean ? '해당 카테고리의 영상을 찾을 수 없습니다.' : 'No videos found for this category.'}</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = filteredVideos.map(video => `
-                <div class="video-card" onclick="openVideo('${video.id.videoId}')">
-                    <img src="https://img.youtube.com/vi/${video.id.videoId}/mqdefault.jpg" 
-                         alt="${video.snippet.title}" class="video-thumbnail">
-                    <div class="video-info">
-                        <h3 class="video-title">${video.snippet.title}</h3>
-                        <p class="video-meta">
-                            ${new Date(video.snippet.publishedAt).toLocaleDateString(isKorean ? 'ko-KR' : 'en-US')}
-                        </p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function clearVideoDisplay() {
-            document.getElementById('video-container').innerHTML = '';
-        }
-
-        function openVideo(videoId) {
-            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-        }
-
-        // Donation Modal
-        function showDonationModal() {
-            document.getElementById('donationModal').classList.add('show');
-        }
-
-        function closeDonationModal() {
-            document.getElementById('donationModal').classList.remove('show');
-        }
-
-        function copyAccount() {
-            navigator.clipboard.writeText('170354-55-000829').then(() => {
-                alert(isKorean ? '계좌번호가 복사되었습니다.' : 'Account number copied.');
-            });
-        }
-
-        // Netlify Identity 설정
-        if (window.netlifyIdentity) {
-            window.netlifyIdentity.on("init", user => {
-                if (!user) {
-                    window.netlifyIdentity.on("login", () => {
-                        document.location.href = "/admin/";
-                    });
-                }
-            });
-        }
-
-        // CMS 컨텐츠 동적 로드 함수들
-        async function loadNewsContent() {
-    try {
-        console.log('뉴스 로드 시작...');
-        const response = await fetch('https://api.github.com/repos/osandaekwang/dgmtv-website/contents/_posts/news');
-        console.log('뉴스 API 응답:', response.status);
-        
-        if (response.ok) {
-            const files = await response.json();
-            console.log('뉴스 파일들:', files);
-            const newsContainer = document.getElementById('news-container');
-            
-            if (files.length > 0) {
-                let newsHtml = '';
-                for (let i = 0; i < Math.min(files.length, 6); i++) {
-                    const file = files[i];
-                    if (file.name.endsWith('.md') && file.name !== 'README.md') {
-                        console.log('뉴스 파일 처리 중:', file.name);
-                        const contentResponse = await fetch(file.download_url);
-                        const content = await contentResponse.text();
-                        console.log('뉴스 파일 내용:', content.substring(0, 200));
-                        
-                        const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-                        if (frontMatterMatch) {
-                            const frontMatter = frontMatterMatch[1];
-                            const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-                            
-                            const title = frontMatter.match(/title:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/title:\s*([^\n]+)/)?.[1] || '제목 없음';
-                            const date = frontMatter.match(/date:\s*(.+)/)?.[1] || '';
-                            const category = frontMatter.match(/category:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/category:\s*([^\n]+)/)?.[1] || '일반';
-                            const excerpt = frontMatter.match(/excerpt:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/excerpt:\s*([^\n]+)/)?.[1] || '';
-                            const image = frontMatter.match(/image:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/image:\s*([^\n]+)/)?.[1] || '';
-                            const author = frontMatter.match(/author:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/author:\s*([^\n]+)/)?.[1] || '관리자';
-                            
-                            console.log('파싱된 뉴스 데이터:', { title, date, category, excerpt, author });
-                            
-                            const categoryColors = {
-                                '중요': 'bg-red-500',
-                                '행사': 'bg-blue-500', 
-                                '예정': 'bg-yellow-500',
-                                '일반': 'bg-gray-500'
-                            };
-                            const categoryColor = categoryColors[category] || 'bg-gray-500';
-                            
-                            newsHtml += `
-                                <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:transform hover:scale-105 transition cursor-pointer" 
-                                         onclick="showNewsModal('${title.replace(/'/g, "\\'")}', '${date}', '${category}', '${author}', '${excerpt.replace(/'/g, "\\'")}', \`${bodyContent.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${image}')">
-                                    ${image ? `<img src="${image}" alt="${title}" class="w-full h-48 object-cover">` : ''}
-                                    <div class="p-6">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <span class="text-xs text-white ${categoryColor} px-2 py-1 rounded">
-                                                ${category}
-                                            </span>
-                                            <span class="text-sm text-gray-500">
-                                                ${new Date(date).toLocaleDateString('ko-KR')}
-                                            </span>
-                                        </div>
-                                        <h4 class="text-xl font-semibold text-gray-800 mb-3">${title}</h4>
-                                        ${excerpt ? `<p class="text-gray-600">${excerpt}</p>` : ''}
-                                        <div class="mt-3 text-sm text-gray-500">
-                                            <span>작성자: ${author}</span>
-                                        </div>
-                                    </div>
-                                </article>
-                            `;
-                        }
-                    }
-                }
-                if (newsHtml) {
-                    newsContainer.innerHTML = newsHtml;
-                } else {
-                    newsContainer.innerHTML = `
-                        <div class="col-span-full text-center py-12">
-                            <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">아직 뉴스가 없습니다.</p>
-                            <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                CMS 관리자로 이동
-                            </a>
-                        </div>
-                    `;
-                }
-            } else {
-                newsContainer.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-newspaper text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">뉴스 파일이 없습니다.</p>
-                        <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                            CMS 관리자로 이동
-                        </a>
-                    </div>
-                `;
-            }
-        } else {
-            console.log('뉴스 API 요청 실패:', response.status);
-        }
-    } catch (error) {
-        console.log('뉴스 로드 중 오류:', error);
-    }
-}
-
-
-
-
-        async function loadResourcesContent() {
-    try {
-        console.log('자료 로드 시작...');
-        const response = await fetch('https://api.github.com/repos/osandaekwang/dgmtv-website/contents/_posts/resources');
-        console.log('자료 API 응답:', response.status);
-        
-        if (response.ok) {
-            const files = await response.json();
-            console.log('자료 파일들:', files);
-            const resourcesContainer = document.getElementById('resources-container');
-            
-            if (files.length > 0) {
-                let resourcesHtml = '';
-                for (let i = 0; i < Math.min(files.length, 6); i++) {
-                    const file = files[i];
-                    if (file.name.endsWith('.md') && file.name !== 'README.md') {
-                        console.log('자료 파일 처리 중:', file.name);
-                        const contentResponse = await fetch(file.download_url);
-                        const content = await contentResponse.text();
-                        console.log('자료 파일 내용:', content.substring(0, 200));
-                        
-                        const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-                        if (frontMatterMatch) {
-                            const frontMatter = frontMatterMatch[1];
-                            const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-                            
-                            const title = frontMatter.match(/title:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/title:\s*([^\n]+)/)?.[1] || '제목 없음';
-                            const date = frontMatter.match(/date:\s*(.+)/)?.[1] || '';
-                            const type = frontMatter.match(/type:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/type:\s*([^\n]+)/)?.[1] || '자료';
-                            const description = frontMatter.match(/description:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/description:\s*([^\n]+)/)?.[1] || '';
-                            const downloadFile = frontMatter.match(/file:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/file:\s*([^\n]+)/)?.[1] || '';
-                            const downloadUrl = frontMatter.match(/download_url:\s*["']([^"']+)["']/)?.[1] || frontMatter.match(/download_url:\s*([^\n]+)/)?.[1] || '';
-                            
-                            console.log('파싱된 자료 데이터:', { title, date, type, description });
-                            
-                            const typeColors = {
-                                '기독교 기사': 'bg-blue-500',
-                                '신학 논문': 'bg-purple-500',
-                                '설교 자료': 'bg-green-500',
-                                '기타 자료': 'bg-gray-500'
-                            };
-                            const typeColor = typeColors[type] || 'bg-gray-500';
-                            
-                            resourcesHtml += `
-                                <article class="bg-white rounded-lg shadow-lg p-6 hover:transform hover:scale-105 transition cursor-pointer"
-                                         onclick="showResourceModal('${title.replace(/'/g, "\\'")}', '${date}', '${type}', '${description.replace(/'/g, "\\'")}', \`${bodyContent.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${downloadFile}', '${downloadUrl}')">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <span class="text-xs text-white ${typeColor} px-2 py-1 rounded">
-                                            ${type}
-                                        </span>
-                                        <span class="text-sm text-gray-500">
-                                            ${new Date(date).toLocaleDateString('ko-KR')}
-                                        </span>
-                                    </div>
-                                    <h4 class="text-xl font-semibold text-gray-800 mb-3">${title}</h4>
-                                    ${description ? `<p class="text-gray-600 mb-4">${description}</p>` : ''}
-                                    <div class="flex flex-wrap gap-2">
-                                        ${downloadFile ? `<span class="inline-flex items-center text-indigo-600 text-sm"><i class="fas fa-download mr-1"></i>파일 첨부</span>` : ''}
-                                        ${downloadUrl ? `<span class="inline-flex items-center text-indigo-600 text-sm"><i class="fas fa-external-link-alt mr-1"></i>외부 링크</span>` : ''}
-                                        <span class="inline-flex items-center text-gray-600 text-sm"><i class="fas fa-eye mr-1"></i>클릭하여 상세보기</span>
-                                    </div>
-                                </article>
-                            `;
-                        }
-                    }
-                }
-                if (resourcesHtml) {
-                    resourcesContainer.innerHTML = resourcesHtml;
-                } else {
-                    resourcesContainer.innerHTML = `
-                        <div class="col-span-full text-center py-12">
-                            <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">아직 자료가 없습니다.</p>
-                            <a href="/admin/" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                                CMS 관리자로 이동
-                            </a>
-                        </div>
-                    `;
-                }
-            } else {
-                resourcesContainer.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-folder-open text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">자료 파일이 없습니다.</p>
-                        <a href="/admin/" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                            CMS 관리자로 이동
-                        </a>
-                    </div>
-                `;
-            }
-        } else {
-            console.log('자료 API 요청 실패:', response.status);
-        }
-    } catch (error) {
-        console.log('자료 로드 중 오류:', error);
-    }
-}
-
-
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCategories();
-            loadChannelVideos('osandae');
-            
-            // CMS 컨텐츠 로드 추가
-            loadNewsContent();
-            loadResourcesContent();
-            
-            // Smooth scrolling
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
-            // 뉴스 모달 함수들
-        function showNewsModal(title, date, category, author, excerpt, content, image) {
-            document.getElementById('newsModalTitle').textContent = title;
-            document.getElementById('newsModalDate').textContent = new Date(date).toLocaleDateString('ko-KR');
-            document.getElementById('newsModalCategory').textContent = category;
-            document.getElementById('newsModalAuthor').textContent = `작성자: ${author}`;
-            document.getElementById('newsModalExcerpt').textContent = excerpt;
-            document.getElementById('newsModalContent').innerHTML = content.replace(/\n/g, '<br>');
-            
-            const categoryColors = {
-                '중요': 'bg-red-500',
-                '행사': 'bg-blue-500', 
-                '예정': 'bg-yellow-500',
-                '일반': 'bg-gray-500'
-            };
-            const categoryElement = document.getElementById('newsModalCategory');
-            categoryElement.className = `text-xs text-white px-2 py-1 rounded ${categoryColors[category] || 'bg-gray-500'}`;
-            
-            const imageContainer = document.getElementById('newsModalImage');
-            if (image) {
-                imageContainer.innerHTML = `<img src="${image}" alt="${title}" class="w-full max-h-96 object-cover rounded-lg">`;
-            } else {
-                imageContainer.innerHTML = '';
-            }
-            
-            document.getElementById('newsModal').classList.remove('hidden');
-            document.getElementById('newsModal').classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeNewsModal() {
-            document.getElementById('newsModal').classList.add('hidden');
-            document.getElementById('newsModal').classList.remove('flex');
-            document.body.style.overflow = 'auto';
-        }
-
-        function showResourceModal(title, date, type, description, content, downloadFile, downloadUrl) {
-            document.getElementById('resourceModalTitle').textContent = title;
-            document.getElementById('resourceModalDate').textContent = new Date(date).toLocaleDateString('ko-KR');
-            document.getElementById('resourceModalType').textContent = type;
-            document.getElementById('resourceModalDescription').textContent = description;
-            document.getElementById('resourceModalContent').innerHTML = content.replace(/\n/g, '<br>');
-            
-            const typeColors = {
-                '기독교 기사': 'bg-blue-500',
-                '신학 논문': 'bg-purple-500',
-                '설교 자료': 'bg-green-500',
-                '기타 자료': 'bg-gray-500'
-            };
-            const typeElement = document.getElementById('resourceModalType');
-            typeElement.className = `text-xs text-white px-2 py-1 rounded ${typeColors[type] || 'bg-gray-500'}`;
-            
-            const linksContainer = document.getElementById('resourceModalLinks');
-            let linksHtml = '';
-            if (downloadFile) {
-                linksHtml += `<a href="${downloadFile}" target="_blank" class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-download mr-2"></i>파일 다운로드</a>`;
-            }
-            if (downloadUrl) {
-                linksHtml += `<a href="${downloadUrl}" target="_blank" class="inline-flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-external-link-alt mr-2"></i>외부 링크 열기</a>`;
-            }
-            linksContainer.innerHTML = linksHtml;
-            
-            document.getElementById('resourceModal').classList.remove('hidden');
-            document.getElementById('resourceModal').classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeResourceModal() {
-            document.getElementById('resourceModal').classList.add('hidden');
-            document.getElementById('resourceModal').classList.remove('flex');
-            document.body.style.overflow = 'auto';
-        }
-
-        document.getElementById('newsModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeNewsModal();
-            }
-        });
-
-        document.getElementById('resourceModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeResourceModal();
-            }
-        });
-// 테스트용 간단한 함수들
-function testNewsModal() {
-    alert('뉴스 모달 테스트');
-    const modal = document.getElementById('newsModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-        
-        // 테스트 데이터 입력
-        document.getElementById('newsModalTitle').textContent = '테스트 뉴스 제목';
-        document.getElementById('newsModalDate').textContent = '2025년 6월 10일';
-        document.getElementById('newsModalCategory').textContent = '중요';
-        document.getElementById('newsModalAuthor').textContent = '작성자: 관리자';
-        document.getElementById('newsModalExcerpt').textContent = '테스트 요약입니다.';
-        document.getElementById('newsModalContent').innerHTML = '테스트 내용입니다.<br>두 번째 줄입니다.';
-    } else {
-        alert('newsModal 요소를 찾을 수 없습니다!');
-    }
-}
-
-// 테스트 버튼 추가 (뉴스 섹션에)
-setTimeout(() => {
-    const newsContainer = document.getElementById('news-container');
-    if (newsContainer) {
-        newsContainer.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <button onclick="testNewsModal()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                    뉴스 모달 테스트
-                </button>
-                <br><br>
-                <a href="/admin/" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    CMS 관리자로 이동
-                </a>
-            </div>
-        `;
-    }
-}, 2000);
-
-    </script>
-</body>
-</html>
-
-<!-- 뉴스 상세보기 모달 -->
-<div id="newsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
-        <div class="p-6 border-b">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span id="newsModalCategory" class="text-xs text-white px-2 py-1 rounded"></span>
-                        <span id="newsModalDate" class="text-sm text-gray-500"></span>
-                    </div>
-                    <h2 id="newsModalTitle" class="text-2xl font-bold text-gray-800"></h2>
-                    <p id="newsModalAuthor" class="text-sm text-gray-600 mt-1"></p>
-                </div>
-                <button onclick="closeNewsModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-        </div>
-        <div class="p-6">
-            <div id="newsModalImage" class="mb-6"></div>
-            <div id="newsModalExcerpt" class="text-lg text-gray-700 mb-4 font-medium"></div>
-            <div id="newsModalContent" class="prose max-w-none text-gray-800 leading-relaxed"></div>
-        </div>
-    </div>
-</div>
-
-<!-- 자료 상세보기 모달 -->
-<div id="resourceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
-        <div class="p-6 border-b">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span id="resourceModalType" class="text-xs text-white px-2 py-1 rounded"></span>
-                        <span id="resourceModalDate" class="text-sm text-gray-500"></span>
-                    </div>
-                    <h2 id="resourceModalTitle" class="text-2xl font-bold text-gray-800"></h2>
-                </div>
-                <button onclick="closeResourceModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-        </div>
-        <div class="p-6">
-            <div id="resourceModalDescription" class="text-lg text-gray-700 mb-4 font-medium"></div>
-            <div id="resourceModalContent" class="prose max-w-none text-gray-800 leading-relaxed mb-6"></div>
-            <div id="resourceModalLinks" class="flex gap-4"></div>
-        </div>
-    </div>
-</div>
-
-</body>
-</html>
-
+                'resources-section-title': isKor
