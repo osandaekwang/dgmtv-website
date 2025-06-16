@@ -1418,20 +1418,20 @@
         function filterVideosByCategory(videos, channel, categoryKey) {
             const filters = {
                 osandae: {
-                    worship: video => /주일|오후예배|예배실황/i.test(video.snippet.title),
+                    worship: video => /주일|예배|worship|서비스/i.test(video.snippet.title),
                     sermon: video => {
                         const title = video.snippet.title.toLowerCase();
-                        return title.includes('[kr/en/jp/cn sub]');
+                        return title.includes('[kr/en/jp/cn sub]') || /말씀|message/i.test(video.snippet.title);
                     },
                     podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
                     ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
                     quiz: video => /퀴즈|quiz/i.test(video.snippet.title),
-                    meditation: video => /오늘.*한.*말씀.*한.*기도|묵상/i.test(video.snippet.title)
+                    meditation: video => /오늘.*한.*말씀.*한.*기도/i.test(video.snippet.title)
                 },
                 dgmtv: {
                     sermon: video => {
-                        const title = video.snippet.title.toLowerCase();
-                        return title.includes('[sermon]');
+                        const title = video.snippet.title;
+                        return title.includes('[Sermon]');
                     },
                     podcast: video => /faithtalk|podcast/i.test(video.snippet.title),
                     quiz: video => /bible trivia|quiz/i.test(video.snippet.title),
