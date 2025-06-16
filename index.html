@@ -1426,7 +1426,7 @@
                     podcast: video => /톺아보기|신앙톡|팟캐스트/i.test(video.snippet.title),
                     ukulele: video => /우쿨|필레오|찬양/i.test(video.snippet.title),
                     quiz: video => /퀴즈|quiz/i.test(video.snippet.title),
-                    meditation: video => /오늘.*한.*말씀.*한.*기도|오늘/i.test(video.snippet.title)
+                    meditation: video => /오늘.*한.*말씀.*한.*기도/i.test(video.snippet.title)
                 },
                 dgmtv: {
                     sermon: video => {
@@ -1439,7 +1439,9 @@
                 }
             };
             
-            return videos.filter(filters[channel][categoryKey] || (() => false)).slice(0, 6);
+            return videos.filter(filters[channel][categoryKey] || (() => false))
+        .sort((a, b) => new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt))
+        .slice(0, 6);
         }
 
         function displayCategoryVideos(channel, categoryKey) {
