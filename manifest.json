@@ -1,0 +1,21 @@
+{
+  "name": "오산대광교회 & DGM TV",
+  "short_name": "대광교회",
+  "description": "진리의 말씀과 사랑의 나눔을 전하는 오산대광교회 공식 PWA입니다.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
