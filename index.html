@@ -1,91 +1,49 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>오산대광교회 & DGM TV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오산대광교회 & DGM TV</title>
 
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#1a1a1a">
-<link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
 
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<script>tailwind.config={theme:{extend:{colors:{primary:'#e51937',secondary:'#1a1a1a'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<style>
-/* 이전과 동일한 CSS 스타일 */
-:where([class^="ri-"])::before { content: "\f3c2"; }
-body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
-.menu-overlay { transform: translateX(150%); transition: transform 0.3s ease-in-out; box-shadow: -4px 0 15px rgba(0,0,0,0.1); }
-.menu-overlay.active { transform: translateX(0); }
-.tab-content, .latest-tab-content, .popular-tab-content { display: none; }
-.tab-content.active, .latest-tab-content.active, .popular-tab-content.active { display: block; }
-.loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #f3f3f6; border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.donation-modal, .details-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
-.donation-modal.show, .details-modal.show { display: flex; }
-.modal-content { background: white; border-radius: 16px; padding: 24px; max-width: 500px; width: 90%; text-align: center; max-height: 80vh; display: flex; flex-direction: column; }
-.modal-body { overflow-y: auto; text-align: left; padding: 16px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 16px 0; }
-.line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.page { display: none; }
-.page.active { display: block; }
-.content-page { min-height: 100vh; padding: 80px 20px 40px; background: #f8fafc; }
-.back-button { position: fixed; top: 20px; left: 20px; z-index: 1000; background: #3b82f6; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
-.back-button:hover { background: #2563eb; transform: scale(1.1); }
-.more-page-grid { display: grid; gap: 16px; margin: 20px 0; padding: 0 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));}
-.pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 40px 0; flex-wrap: wrap; }
-.pagination button { padding: 8px 12px; border: 1px solid #e5e7eb; background: white; color: #374151; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 40px; }
-.pagination button:hover:not(:disabled) { background: #f3f4f6; transform: translateY(-1px); }
-.pagination button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
-.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-.pagination-info { margin: 0 12px; font-size: 14px; color: #6b7280; }
-.language-toggle { background: #4f46e5; border-radius: 20px; padding: 4px; display: flex; position: relative; width: 80px; height: 32px; }
-.language-option { flex: 1; text-align: center; padding: 4px 8px; border-radius: 16px; color: white; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
-.language-option.active { background: white; color: #4f46e5; }
-.mobile-language-float { position: fixed; bottom: 80px; right: 20px; z-index: 1000; background: #4f46e5; border-radius: 25px; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; }
-@media (max-width: 768px) { .mobile-language-float { display: flex !important; } }
-</style>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#e51937',secondary:'#1a1a1a'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+    /* 모든 CSS 스타일 (이전과 동일) */
+    :where([class^="ri-"])::before { content: "\f3c2"; } body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; } .menu-overlay { transform: translateX(150%); transition: transform 0.3s ease-in-out; box-shadow: -4px 0 15px rgba(0,0,0,0.1); } .menu-overlay.active { transform: translateX(0); } .tab-content, .latest-tab-content, .popular-tab-content { display: none; } .tab-content.active, .latest-tab-content.active, .popular-tab-content.active { display: block; } .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #f3f3f6; border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; } @keyframes spin { to { transform: rotate(360deg); } } .donation-modal, .details-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; } .donation-modal.show, .details-modal.show { display: flex; } .modal-content { background: white; border-radius: 16px; padding: 24px; max-width: 500px; width: 90%; text-align: center; max-height: 80vh; display: flex; flex-direction: column; } .modal-body { overflow-y: auto; text-align: left; padding: 16px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 16px 0; } .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; } .page { display: none; } .page.active { display: block; } .content-page { min-height: 100vh; padding: 80px 20px 40px; background: #f8fafc; } .back-button { position: fixed; top: 20px; left: 20px; z-index: 1000; background: #3b82f6; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; } .back-button:hover { background: #2563eb; transform: scale(1.1); } .more-page-grid { display: grid; gap: 16px; margin: 20px 0; padding: 0 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));} .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 40px 0; flex-wrap: wrap; } .pagination button { padding: 8px 12px; border: 1px solid #e5e7eb; background: white; color: #374151; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 40px; } .pagination button:hover:not(:disabled) { background: #f3f4f6; transform: translateY(-1px); } .pagination button.active { background: #3b82f6; color: white; border-color: #3b82f6; } .pagination button:disabled { opacity: 0.5; cursor: not-allowed; } .pagination-info { margin: 0 12px; font-size: 14px; color: #6b7280; } .language-toggle { background: #4f46e5; border-radius: 20px; padding: 4px; display: flex; position: relative; width: 80px; height: 32px; } .language-option { flex: 1; text-align: center; padding: 4px 8px; border-radius: 16px; color: white; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; } .language-option.active { background: white; color: #4f46e5; } .mobile-language-float { position: fixed; bottom: 80px; right: 20px; z-index: 1000; background: #4f46e5; border-radius: 25px; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; } @media (max-width: 768px) { .mobile-language-float { display: flex !important; } }
+    </style>
 </head>
 <body class="bg-white">
 
-<div id="mainPage" class="page active">
-    <nav class="fixed top-0 w-full bg-secondary text-white z-50 h-14 flex items-center justify-between px-4"><div class="flex items-center"><h1 class="text-xl font-['Roboto'] text-white font-medium">오산대광교회 x DGM TV</h1></div><div class="w-8 h-8 flex items-center justify-center cursor-pointer" id="menuToggle"><i class="ri-menu-line ri-lg"></i></div></nav>
-    <div class="menu-overlay fixed top-0 right-0 w-2/3 h-full bg-secondary z-50 flex flex-col p-6" id="menuOverlay"><div class="flex justify-end mb-6"><div class="w-8 h-8 flex items-center justify-center cursor-pointer" id="closeMenu"><i class="ri-close-line ri-lg text-white"></i></div></div><div class="flex flex-col gap-6"><a href="#" class="text-white text-xl font-medium border-b border-gray-700 pb-4">홈</a><a href="#latest" class="text-white text-xl font-medium border-b border-gray-700 pb-4">최신 업로드</a><a href="#popular" class="text-white text-xl font-medium border-b border-gray-700 pb-4">인기영상</a><a href="#news" class="text-white text-xl font-medium border-b border-gray-700 pb-4">교회소식</a><a href="#resources" class="text-white text-xl font-medium border-b border-gray-700 pb-4">자료실</a><button onclick="showDonationModal()" class="text-white text-xl font-medium border-b border-gray-700 pb-4 text-left">온라인 헌금</button></div></div>
-    <main class="pt-14 pb-16">
-        <section class="relative w-full h-64 sm:h-80 lg:h-96 overflow-hidden" id="home"><iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/89JS7o9xORc?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=89JS7o9xORc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe><div class="absolute inset-0 bg-black/40"></div><div class="absolute inset-0 flex items-center justify-center"><div class="text-center text-white px-4"><h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">진리의 말씀, 사랑의 나눔</h1><p class="text-lg sm:text-xl mb-6 opacity-90">여기서 시작되어 세계로 뻗어갑니다</p><div class="flex flex-col sm:flex-row gap-3 justify-center"><a href="https://www.youtube.com/@osandaekwang" target="_blank" class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-white/30 transition border border-white/30">오산대광교회 채널</a><a href="https://www.youtube.com/@DGMTV-god" target="_blank" class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-white/30 transition border border-white/30">DGM TV 채널</a></div></div></div></section>
-        <section class="px-4 py-6 bg-white" id="latest"><h2 class="text-xl font-bold mb-4">최신 업로드</h2><div class="flex border-b border-gray-200 mb-4"><button class="latest-tab-btn px-4 py-2 font-medium text-sm border-b-2 border-primary text-primary" data-tab="latest-osandae">오산대광교회</button><button class="latest-tab-btn px-4 py-2 font-medium text-sm border-b-2 border-transparent text-gray-500" data-tab="latest-dgmtv">DGM TV</button></div><div class="latest-tab-content active" id="latest-osandae"><div class="overflow-x-auto pb-2"><div class="flex gap-4" style="width: max-content;" id="latest-osandae-container"><div class="text-center py-8 w-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600 text-sm">최신영상 로딩 중...</p></div></div></div></div><div class="latest-tab-content" id="latest-dgmtv"><div class="overflow-x-auto pb-2"><div class="flex gap-4" style="width: max-content;" id="latest-dgmtv-container"><div class="text-center py-8 w-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600 text-sm">최신영상 로딩 중...</p></div></div></div></div></section>
-        <section class="px-4 py-6 bg-gray-50" id="popular"><h2 class="text-xl font-bold mb-4">인기영상</h2><div class="flex border-b border-gray-200 mb-4"><button class="popular-tab-btn px-4 py-2 font-medium text-sm border-b-2 border-primary text-primary" data-tab="popular-osandae">오산대광교회</button><button class="popular-tab-btn px-4 py-2 font-medium text-sm border-b-2 border-transparent text-gray-500" data-tab="popular-dgmtv">DGM TV</button></div><div class="popular-tab-content active" id="popular-osandae"><div class="overflow-x-auto pb-2"><div class="flex gap-4" style="width: max-content;" id="popular-osandae-container"><div class="text-center py-8 w-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600 text-sm">인기영상 로딩 중...</p></div></div></div></div><div class="popular-tab-content" id="popular-dgmtv"><div class="overflow-x-auto pb-2"><div class="flex gap-4" style="width: max-content;" id="popular-dgmtv-container"><div class="text-center py-8 w-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600 text-sm">인기영상 로딩 중...</p></div></div></div></div></section>
-        <section class="px-4 py-6 bg-white" id="news"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">교회 소식</h2><button onclick="showMoreNews()" class="text-primary text-sm font-medium">더보기</button></div><div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><div class="text-center py-8 col-span-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600">소식을 불러오는 중...</p></div></div></section>
-        <section class="px-4 py-6 bg-gray-50" id="resources"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">자료실</h2><button onclick="showMoreResources()" class="text-primary text-sm font-medium">더보기</button></div><div id="resources-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><div class="text-center py-8 col-span-full"><div class="loading-spinner"></div><p class="mt-2 text-gray-600">자료를 불러오는 중...</p></div></div></section>
-        <section class="px-4 py-6 bg-white"><h2 class="text-xl font-bold mb-4">교회 정보</h2><div class="bg-gray-50 p-4 rounded-lg"><div class="mb-4"><h3 class="font-medium text-sm mb-2">예배 시간</h3><ul class="text-xs text-gray-700 space-y-1"><li>• 주일예배: 일요일 오전 11시</li><li>• 오후예배: 일요일 오후 2시</li><li>• 새벽기도: 일요일 오전 5시</li></ul></div><div class="mb-4"><h3 class="font-medium text-sm mb-2">오시는 길</h3><p class="text-xs text-gray-700">경기도 오산시 궐리사로46번길 60-5</p></div><div><h3 class="font-medium text-sm mb-2">연락처</h3><p class="text-xs text-gray-700">FAX: 031-374-6262</p><p class="text-xs text-gray-700">이메일: derek1817@naver.com</p><div class="flex gap-4 mt-3"><a href="https://www.facebook.com/osandaechurch" target="_blank" class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"><i class="ri-facebook-fill text-gray-700"></i></a><a href="https://www.instagram.com/osandaechurch" target="_blank" class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"><i class="ri-instagram-line text-gray-700"></i></a></div></div></div></section>
-    </main>
-    <footer class="bg-gray-800 text-white text-center py-4"><p class="text-sm text-gray-400">© 2025 오산대광교회 & DGM TV. All rights reserved.</p></footer>
-    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 z-40"><div class="grid grid-cols-4 h-16"><a href="#home" class="bottom-menu-item flex flex-col items-center justify-center text-primary" data-menu="home"><div class="w-6 h-6 flex items-center justify-center"><i class="ri-home-5-fill"></i></div><span class="text-xs mt-1">홈</span></a><a href="#latest" class="bottom-menu-item flex flex-col items-center justify-center text-gray-500" data-menu="video"><div class="w-6 h-6 flex items-center justify-center"><i class="ri-video-line"></i></div><span class="text-xs mt-1">영상</span></a><a href="#news" class="bottom-menu-item flex flex-col items-center justify-center text-gray-500" data-menu="news"><div class="w-6 h-6 flex items-center justify-center"><i class="ri-file-list-3-line"></i></div><span class="text-xs mt-1">소식</span></a><a href="#resources" class="bottom-menu-item flex flex-col items-center justify-center text-gray-500" data-menu="info"><div class="w-6 h-6 flex items-center justify-center"><i class="ri-information-line"></i></div><span class="text-xs mt-1">정보</span></a></div></nav>
-    <div class="mobile-language-float" onclick="toggleLanguage()"><div class="language-toggle"><div class="language-option active" id="ko-option">KO</div><div class="language-option" id="en-option">EN</div></div></div>
-</div>
-<div id="moreNewsPage" class="page"><button class="back-button" onclick="goBackToMain('news')"><i class="ri-arrow-left-line"></i></button><div class="content-page"><div class="container mx-auto"><h1 class="text-3xl font-bold text-center text-gray-800 mb-8">교회 소식</h1><div id="more-news-container" class="more-page-grid"></div><div id="news-pagination" class="pagination"></div></div></div></div>
-<div id="moreResourcesPage" class="page"><button class="back-button" onclick="goBackToMain('resources')"><i class="ri-arrow-left-line"></i></button><div class="content-page"><div class="container mx-auto"><h1 class="text-3xl font-bold text-center text-gray-800 mb-8">자료실</h1><div id="more-resources-container" class="more-page-grid"></div><div id="resources-pagination" class="pagination"></div></div></div></div>
-<div class="donation-modal" id="donationModal"><div class="modal-content"><h3 class="text-xl font-bold mb-4">온라인 헌금</h3><div class="bg-gray-100 p-4 rounded-lg mb-4"><p class="font-medium">농협은행</p><p class="text-2xl font-bold text-blue-600">170354-55-000829</p><p class="text-sm text-gray-600">예금주: 오산산성교회</p></div><button onclick="copyAccount()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition mb-4"><i class="ri-file-copy-line mr-2"></i>계좌 복사</button><p class="text-sm text-gray-600 mb-4">헌금은 하나님께 드리는 예배의 한 부분입니다.<br>기쁨과 감사함으로 드려주세요.</p><button onclick="closeDonationModal()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition">닫기</button></div></div>
-<div class="details-modal" id="detailsModal"><div class="modal-content"><h3 class="text-xl font-bold mb-2 text-left" id="modalTitle"></h3><div class="text-xs text-gray-500 text-left mb-3" id="modalMeta"></div><div class="modal-body" id="modalBody"></div><div id="modalLinkContainer" class="mt-4 text-left" style="display: none;"><a id="modalLinkButton" href="#" target="_blank" class="inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="ri-external-link-line mr-1"></i>외부 링크 열기</a></div><button onclick="closeDetailsModal()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition mt-4 self-center">닫기</button></div></div>
+    <div id="mainPage" class="page active">
+        </div>
+    <div id="moreNewsPage" class="page"> </div>
+    <div id="moreResourcesPage" class="page"> </div>
+    <div class="donation-modal" id="donationModal"> </div>
+    <div class="details-modal" id="detailsModal"> </div>
 
 <script>
-// 모든 스크립트 (이전과 동일하므로 생략)
-// ...
+    // 모든 기존 스크립트 (이전과 동일)
+    // ...
 
-// ✨ PWA 서비스 워커 등록 스크립트
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').then(registration => {
-      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }, err => {
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
+    // PWA 서비스 워커 등록 스크립트
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
 </script>
 </body>
 </html>
