@@ -590,7 +590,7 @@ function displayNews() {
             <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:transform hover:scale-105 transition cursor-pointer" onclick="alert('소식 상세: ${news.title}')">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs text-white bg-green-600 px-2 py-1 rounded">${news.category}</span>
+                        <span class="text-xs text-white bg-red-600 px-2 py-1 rounded">${news.category}</span>
                         <span class="text-sm text-gray-500">${new Date(news.date).toLocaleDateString('ko-KR')}</span>
                     </div>
                     <h4 class="text-xl font-semibold text-gray-800 mb-3">${news.title}</h4>
